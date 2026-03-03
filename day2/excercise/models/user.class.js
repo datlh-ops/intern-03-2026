@@ -1,5 +1,5 @@
 class User{
-    constructor(name, age, job, rent, room, moveInDate, moveOutDate = null){
+    constructor(name, age, job, room, moveInDate, moveOutDate = null){
         this.name = name;
         this.age = age;
         this.job = job;
@@ -11,7 +11,7 @@ class User{
     getRentFee(){
         const monthlyPrice = this.room.price;
         const dailyPrice = 50;
-        if(this.rent === "yes"){
+        if(this.rent){
             return monthlyPrice;
         }
         // update cách tính tiền phòng nếu người 
@@ -48,12 +48,12 @@ class User{
         console.log(`${this.name} thue phong ${this.room.name} tu ngay ${this.moveInDate}`);
     }
     updateRentStatus(){
-    if(this.rent === "yes"){
-        this.rent = "no";
+    if(this.rent ){
+        this.rent = false;
         this.moveOutDate = new Date();
         this.room.markAsAvailable(); ;
     } else {
-        this.rent = "yes";
+        this.rent = true;
         this.moveInDate = new Date(); 
         this.moveOutDate = null;
         this.room.markAsRented();

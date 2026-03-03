@@ -5,8 +5,8 @@ import Room from "./models/room.class.js";
 const room101 = new Room("101", 1000);
 const room102 = new Room("102", 900);
 
-const u1 = new User("Dat", 23, "student","yes", room101,"2026-02-01");
-const u2 = new User("Minh", 23, "worker","yes", room101, "2026-03-01");
+const u1 = new User("Dat", 23, "student", room101,"2026-01-01");
+const u2 = new User("Minh", 23, "worker", room101, "2026-03-01");
 
 //a) thông tin của người thuê nhá 
 u1.showUserInfo();
@@ -30,6 +30,7 @@ manager.addMaster(master1);
 manager.showReport();
 console.log("____________________________")
 //d) thiết kế cách tính tiền mới nếu có người rời đi khi chưa hết tháng 
-manager.showRentMoneyUserLeave(u1,master1);
+master1.showRentMoneyUserLeave(u1);
 //e) phòng trọ có nhiều phòng có giá khác nhau, 
-manager.showRoomInformation(master1);
+master1.showHighestIncomeRoom();
+master1.showAvailableRooms();

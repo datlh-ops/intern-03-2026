@@ -12,11 +12,6 @@ class Master{
     addRoom(room){
         this.rooms.push(room);
     }
-    kickUser(user){
-        this.users = this.users.filter(u => u !== user);
-        user.room.markAsAvailable();
-        user.updateRentStatus();
-    }
     calculateRentMoney(){
         let total = 0;
         for(const i of this.users){
@@ -61,5 +56,14 @@ class Master{
             console.log(`Phong trống: ${room.name}`);
         });
     }
+    showRentMoneyUserLeave(user){
+        user.updateRentStatus();
+        console.log("Phong tro co nguoi roi di khi chua het thang");
+        console.log("User: " + user.name);
+        console.log("Rent money: " + user.getRentFee());
+        this.users = this.users.filter(u => u !== user);
+        user.room.markAsAvailable();
+        user.updateRentStatus();
+    } 
 }
 export default Master;

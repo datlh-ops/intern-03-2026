@@ -12,18 +12,6 @@ class MasterManage{
             console.log("Doanh thu :"+i.calculateRentMoney());
             console.log("-----------------");
         }
-    }
-    showRentMoneyUserLeave(user,master){
-        user.updateRentStatus();
-        console.log("Phong tro co nguoi roi di khi chua het thang");
-        console.log("User: " + user.name);
-        console.log("Rent money: " + user.getRentFee());
-        master.kickUser(user);
     } 
-    showRoomInformation(master){
-        console.log("Thong tin phong tro");   
-        master.showAvailableRooms();
-        master.showHighestIncomeRoom();
-    }
 }
 export default MasterManage;
