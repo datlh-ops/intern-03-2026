@@ -25,4 +25,4 @@ manager.showReport();
 console.log("____________________________")
 //d) thiết kế cách tính tiền mới nếu có người rời đi khi chưa hết tháng 
 manager.showRentMoneyUserLeave(u1,master1);
-
+//e) phòng trọ có nhiều phòng có giá khác nhau, 
