@@ -3,7 +3,7 @@ class User{
         this.name = name;
         this.age = age;
         this.job = job;
-        this.rent = rent;
+        this.rent = false;
         this.room = room;
         this.moveInDate = new Date(moveInDate);
         this.moveOutDate = null;
@@ -39,19 +39,19 @@ class User{
         }
     }
     getInfo(){
-        return `${this.name} - ${this.age} - ${this.job} - ${this.rent} - ${this.room.name} - ${this.moveInDate} - ${this.moveOutDate} } `;
+        return `${this.name} - ${this.age} - ${this.job} - ${this.rent} - ${this.room.name} - ${this.moveInDate} - ${this.moveOutDate}  `;
     }
     showUserInfo(){
         console.log(this.getInfo());
     }
     showUserRentInformation(){
-        console.log(`${this.name} - ${this.age} - ${this.job} - ${this.rent} - ${this.room.name} - ${this.moveInDate} - ${this.moveOutDate} } `);
+        console.log(`${this.name} thue phong ${this.room.name} tu ngay ${this.moveInDate}`);
     }
     updateRentStatus(){
     if(this.rent === "yes"){
         this.rent = "no";
         this.moveOutDate = new Date();
-        this.room.markAsAvailable(); 
+        this.room.markAsAvailable(); ;
     } else {
         this.rent = "yes";
         this.moveInDate = new Date(); 

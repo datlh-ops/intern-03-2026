@@ -3,12 +3,15 @@ class Room{
         this.name = name;
         this.price = price;
         this.isRented = false;
+        this.user=null;
     }
-    markAsRented(){
+    markAsRented(user){
         this.isRented = true;
+        this.user=user ;
     }
     markAsAvailable(){
         this.isRented = false;
+        this.user = null;
     }
     Income(){
         if(this.isRented){

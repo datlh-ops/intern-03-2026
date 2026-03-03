@@ -6,12 +6,16 @@ class Master{
     }
     addUser(user){
         this.users.push(user);
+        user.room.markAsRented(user);
+        user.updateRentStatus();
     }
     addRoom(room){
         this.rooms.push(room);
     }
-    kickUser(){
-        this.users = this.users.filter(user => user.rent != "no");
+    kickUser(user){
+        this.users = this.users.filter(u => u !== user);
+        user.room.markAsAvailable();
+        user.updateRentStatus();
     }
     calculateRentMoney(){
         let total = 0;
@@ -32,16 +36,24 @@ class Master{
             console.log("khong co phong tro nao");
             return;
         }
-        let highestIncomeRoom = this.rooms[0];
-        let highestIncome = highestIncomeRoom.price;
-        for(const room of this.rooms){
-            const income = room.price;
-            if(income > highestIncome){
-                highestIncome = income;
-                highestIncomeRoom = room;
-            }
+        const rentedRooms = this.rooms.filter(room => room.isRented);
+        if(rentedRooms.length === 0){
+            console.log("khong co phong tro nao dang duoc thue");
+            return;
         }
-        console.log(`phong tro co doanh thu cao nhat: ${highestIncomeRoom.name} - Doanh thu: ${highestIncomeRoom.price}`);
+        else {
+            let highestIncomeRoom = rentedRooms[0];
+            let highestIncome = 0;
+            rentedRooms.forEach(room => {
+                room.income = room.Income();
+                if(room.income > highestIncome){
+                    highestIncome = room.income;
+                    highestIncomeRoom = room;
+                }
+            });
+            console.log(`phong tro co doanh thu cao nhat: ${highestIncomeRoom.name} - Doanh thu: ${highestIncomeRoom.price}`);
+        }
+        
     }
     showAvailableRooms(){
         const availableRooms = this.rooms.filter(room => !room.isRented);

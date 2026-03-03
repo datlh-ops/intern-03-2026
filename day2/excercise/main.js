@@ -6,7 +6,7 @@ const room101 = new Room("101", 1000);
 const room102 = new Room("102", 900);
 
 const u1 = new User("Dat", 23, "student","yes", room101,"2026-02-01");
-const u2 = new User("Minh", 23, "worker","yes", room102, "2026-03-01");
+const u2 = new User("Minh", 23, "worker","yes", room101, "2026-03-01");
 
 //a) thông tin của người thuê nhá 
 u1.showUserInfo();
