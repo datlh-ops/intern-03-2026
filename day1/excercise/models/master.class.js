@@ -13,6 +13,9 @@ class Master{
         }
         return total;
     }
+    showMasterInfo(){
+        console.log( `chu tro ${this.name}`);
+    }
     showUsers(){
         console.log(`thong tin nguoi thue nha ${this.name}`);
         this.users.forEach(t=> console.log(t.getInfo()))

@@ -8,7 +8,7 @@ class MasterManage{
     showReport(){
         console.log("bao cao thong tin chu tro");
         for(const i of this.masters){
-            i.showUsers();
+            i.showMasterInfo();
             console.log("Doanh thu :"+i.calculateRentMoney());
             console.log("-----------------");
         }

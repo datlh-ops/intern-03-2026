@@ -12,5 +12,11 @@ class User{
     getInfo(){
         return `${this.name} - ${this.age} - ${this.job} - ${this.roomName} `;
     }
+    showUserInfo(){
+        console.log(this.getInfo());
+    }
+    showUserRentInformation(){
+        console.log(`${this.name} thue phong so ${this.roomName} voi gia tien la ${this.getRentFee()}/thang`);
+    }
 }
 export default User;
