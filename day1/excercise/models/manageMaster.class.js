@@ -19,6 +19,11 @@ class MasterManage{
         console.log("User: " + user.name);
         console.log("Rent money: " + user.getRentFee());
         master.kickUser(user);
-    }    
+    } 
+    showRoomInformation(master){
+        console.log("Thong tin phong tro");   
+        master.showAvailableRooms();
+        master.showHighestIncomeRoom();
+    }
 }
 export default MasterManage;
