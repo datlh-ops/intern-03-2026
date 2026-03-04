@@ -1,3 +1,5 @@
+"use strict"
+
 import User from "./models/user.class.js";
 import Master from "./models/master.class.js";
 import MasterManage from "./models/manageMaster.class.js";

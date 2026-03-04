@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Day 3 - Quản lý cho thuê trọ</h1>
+    <p id ="text">Hôm nay chúng ta sẽ xây dựng giao diện quản lý cho thuê trọ</p>
+    <button id ="this-btn">Xem giao diện</button>
+
+    <input id ="text-input" type="text" placeholder="Nhập tên của bạn">
+    <button id ="submit-text-btn">Submit</button>
+    <script>
+        let btn = document.getElementById("this-btn");
+        btn.addEventListener("click", function() {
+            let text = document.getElementById("text");
+            text.innerHTML = "giao diện của bạn đã được cập nhật";
+        });
+        let submitBtn = document.getElementById("submit-text-btn");
+        submitBtn.addEventListener("click", function() {
+            let input = document.getElementById("text-input");
+            let name = input.value;
+            let text = document.getElementById("text");
+            text.innerHTML = `Xin chào, ${name}!`;
+        });
+    </script>
+</body>
+</html>
