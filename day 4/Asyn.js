@@ -51,4 +51,35 @@ function receive(value){
     });
 }
 order().then(
-    result => cooking(result)).then(result => deliver(result)).then(result => receive(result)).then(result => console.log(result));
+    result => cooking(result)).
+    then(result => deliver(result)).
+    then(result => receive(result)).
+    then(result => console.log(result));
+
+async function orderDoAn(){
+    let step1 = await order();
+    let step2 = await cooking(step1);
+    let [delivery,receiver]= await Promise.all([
+        deliver(step2),receive(step2)
+    ]);
+    console.log(delivery,'|',receiver,'|',step1);
+}
+orderDoAn();
+
+async function getTotalPrice() {
+    try{
+        const response = await fetch("https://dummyjson.com/products");
+        const mang = await response.json();
+        const data = mang.products;
+
+        const total = data.reduce((sum,p)=> sum + p.price,0);
+        console.log("tong gia tri san phamr", + total);
+
+    }catch(err){
+        console.log(err);
+    }
+    
+    
+}
+getTotalPrice();
+console.log("hello");
