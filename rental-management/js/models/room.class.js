@@ -1,10 +1,12 @@
 class Room{
-    constructor(name, price,owner){
+    static nextId = 1;
+    constructor(name, price,ownerId){
+        this.id = Room.nextId++; // phân biệt giữa các room khác nhau
         this.name = name;
         this.price = price;
         this.isRented = false;
         this.user=null;
-        this.owner = owner;
+        this.ownerId = ownerId;
     }
     markAsRented(user){
         this.isRented = true;

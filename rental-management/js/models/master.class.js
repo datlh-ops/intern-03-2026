@@ -1,16 +1,14 @@
 class Master{
+    static isExisted = 1;
     constructor(name){
+        this.id = Master.isExisted++;
         this.name = name;
         this.users = [];
-        this.rooms = [];
     }
     addUser(user){
         this.users.push(user);
         user.room.markAsRented(user);
         user.updateRentStatus();
-    }
-    addRoom(room){
-        this.rooms.push(room);  
     }
     calculateRentMoney(){
         let total = 0;

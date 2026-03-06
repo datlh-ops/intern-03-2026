@@ -60,3 +60,44 @@
     display: flex;
     gap: 20px;
 }
+.room-form{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.room-form input,
+.room-form select{
+    padding:8px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+.room-form button{
+    padding:8px 16px;
+    border:none;
+    background:#3b82f6;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.room-form button:hover{
+    background:#2563eb;
+}
+
+#room-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+#room-table th,
+#room-table td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+#room-table th{
+    background:#f3f4f6;
+}
