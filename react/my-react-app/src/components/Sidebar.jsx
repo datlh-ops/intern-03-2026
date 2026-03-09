@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 export default function Sidebar() {
   return (
     <div className="sidebar">
-      <h2>Rental Manager</h2>
+      <h2>QUẢN LÝ THUÊ TRỌ</h2>
 
       <ul>
         <li>
