@@ -1,0 +1,96 @@
+/* Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Layout tổng */
+.layout {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.sidebar {
+    width: 230px;
+    background-color: #aad7dd;
+    color: #1f2933;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #d6e3e6;
+}
+
+/* Title */
+.sidebar h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    padding-left: 6px;
+}
+
+/* Menu */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+/* Menu item */
+.sidebar li {
+    margin-bottom: 8px;
+}
+
+/* Button menu */
+.sidebar button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #1f2933;
+    text-align: left;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Hover */
+.sidebar button:hover {
+    background-color: #8ecad0;
+}
+
+/* Active */
+.sidebar button.active {
+    background-color: #5bb8c1;
+    color: white;
+    font-weight: 600;
+}
+/* ================= MAIN ================= */
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+
+.header {
+    height: 60px;
+    background-color: white;
+    color: black;
+    display: flex;            
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+
+.content {
+    flex: 1;
+    padding: 24px;
+    background-color: white;
+}
