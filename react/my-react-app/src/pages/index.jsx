@@ -2,3 +2,4 @@ export { default as Dashboard } from "./Dashboard";
 export { default as Masters   } from "./Masters"
 export {default as Rooms } from "./Rooms"
 export {default as Users} from "./Users"
+export {default as Contracts} from "./Contracts"

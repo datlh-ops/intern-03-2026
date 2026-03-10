@@ -4,6 +4,7 @@ import { Dashboard } from "./pages";
 import {Masters    } from "./pages";
 import {Rooms } from "./pages"
 import {Users} from "./pages";
+import {Contracts} from "./pages"
 
 import "./styles/layout.css";
 
@@ -16,6 +17,7 @@ function App() {
           <Route path ="/masters" element ={<Masters />} />
           <Route path="/rooms" element ={<Rooms />} />
           <Route path="/users" element = {<Users />} />
+          <Route path="/contracts" element ={<Contracts />} />
         </Routes>
       </Layout>
     </BrowserRouter>
