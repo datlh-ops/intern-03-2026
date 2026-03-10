@@ -1,0 +1,102 @@
+.masters-page {
+    padding: 24px;
+}
+
+/* title */
+
+.masters-page h2 {
+    margin-bottom: 20px;
+}
+
+/* form */
+
+.master-form {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.master-form input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+.master-form input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.master-form button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.master-form button:hover {
+    background: #1d4ed8;
+}
+
+/* table */
+
+.master-table {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+}
+
+.master-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.master-table th {
+    text-align: left;
+    font-size: 14px;
+    color: #6b7280;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.master-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.master-table tr:hover {
+    background: #f9fafb;
+}
+
+/* buttons */
+
+.action-btn {
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 6px;
+}
+
+.btn-edit {
+    background: #facc15;
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+}
