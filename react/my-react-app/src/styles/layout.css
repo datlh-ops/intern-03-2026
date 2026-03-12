@@ -1,4 +1,4 @@
-* {
+ * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -61,8 +61,11 @@
     flex-direction: column;
     background-color: #f8f9fa;
 }
-
-
+.content {
+    flex: 1;
+    padding: 24px;
+    background-color: white;
+}
 .header {
     height: 60px;
     background: #ffffff;
@@ -73,14 +76,40 @@
 
     padding: 0 24px;
 }
+
 .header h1 {
     font-size: 20px;
     font-weight: 700;
     color: #111827;
     margin: 0;
 }
-.content {
-    flex: 1;
-    padding: 24px;
-    background-color: white;
+
+/* khu vực user */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+/* chữ xin chào */
+.user-info span {
+    font-size: 14px;
+    color: #374151;
+}
+
+/* nút logout */
+.header button.logout {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.header button.logout:hover {
+    background-color: #dc2626;
 }

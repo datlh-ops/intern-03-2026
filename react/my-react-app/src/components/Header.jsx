@@ -1,8 +1,36 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Header() {
+
+  const navigate = useNavigate();
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const handleLogout = () => {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login");
+
+  };
+
   return (
     <div className="header">
 
-      <h1>Quản lý phòng trọ</h1>
+      <h1></h1>
+
+      {user && (
+        <div className="user-info">
+
+          <span>Xin chào, {user.username}</span>
+
+          <button className="logout" onClick={handleLogout}>
+            Đăng xuất
+          </button>
+
+        </div>
+      )}
 
     </div>
   );
