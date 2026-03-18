@@ -53,18 +53,42 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, user);
     }
     if (method === "GET" && path === "/users") {
-        const data = await readData();
-        const query = parsedUrl.query;
-        console.log(query);
-        if (Object.keys(query).length === 0) {
-            return send(res, 200, data);
-        }
-        const filteredUsers = data.filter(user => {
-            return Object.keys(query).every(key => {
-            return user[key]?.toString() === query[key];
-            });
+      const data = await readData();
+      const query = parsedUrl.query;
+      console.log(query);
+      if (Object.keys(query).length === 0) {
+        return send(res, 200, data);
+      }
+      let result = data.filter(user => {
+        return Object.keys(query).every(key => {
+          if (key === "sort") return true; 
+          const userValue = user[key];
+          if (userValue === undefined || userValue === null) {
+            return false;
+          }
+          return userValue
+            .toString()
+            .toLowerCase()
+            .includes(query[key].trim().toLowerCase());
         });
-        return send(res, 200, filteredUsers);
+      });
+      if (query.sort){
+        const [sortKey, sortOrder] = query.sort
+          .replace("[", "")
+          .replace("]", "")
+          .split(",");
+        result.sort((a, b) => {
+          const valA = a[sortKey];
+          const valB = b[sortKey];
+          if (typeof valA === "number" && typeof valB === "number") {
+            return sortOrder === "asc" ? valA - valB : valB - valA;
+          }
+          return sortOrder === "asc"
+            ? valA.toString().localeCompare(valB.toString())
+            : valB.toString().localeCompare(valA.toString());
+        });
+      }
+      return send(res, 200, result);
     }
     if (method === "POST" && path === "/users") {
       let newUser;
