@@ -2,8 +2,9 @@ const mongoose = require("mongoose");
 
 const masterSchema = new mongoose.Schema({
   name: String,
+  phone : String,
   email: String,
-  age: Number,
+  address: String
 });
 
 module.exports = mongoose.model("Master", masterSchema);

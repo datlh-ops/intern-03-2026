@@ -17,9 +17,7 @@ export default function MasterForm({ addMaster }) {
       email,
       address
     };
-
     addMaster(newMaster);
-
     setName("");
     setPhone("");
     setEmail("");
@@ -44,6 +42,7 @@ export default function MasterForm({ addMaster }) {
         placeholder="Số điện thoại"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
+        required
       />
 
       <input
@@ -51,6 +50,7 @@ export default function MasterForm({ addMaster }) {
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        required
       />
 
       <input
@@ -58,6 +58,7 @@ export default function MasterForm({ addMaster }) {
         placeholder="Địa chỉ"
         value={address}
         onChange={(e) => setAddress(e.target.value)}
+        required
       />
 
       <button type="submit">Thêm</button>

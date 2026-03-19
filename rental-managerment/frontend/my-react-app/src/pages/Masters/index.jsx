@@ -3,33 +3,47 @@ import MasterForm from "./components/MasterForm";
 import MasterTable from "./components/MasterTable";
 import "./master.css";
 
+import {
+  getMasters,
+  createMaster,
+  deleteMaster as deleteMasterApi,
+} from "../../api/master.api";
+
 export default function Masters() {
+  const [masters, setMasters] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await getMasters();
+        setMasters(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  const [masters, setMasters] = useState(() => {
-    const saved = localStorage.getItem("masters");
-    return saved ? JSON.parse(saved) : []
-  })
-  useEffect(()=>{
-    localStorage.setItem("masters",JSON.stringify(masters))
-  }, [masters])
-
-  const addMaster = (master) => {
-    setMasters([...masters, master]);
+    fetchData();
+  }, []);
+  const addMaster = async (master) => {
+    try {
+      const res = await createMaster(master);
+      setMasters((prev) => [...prev, res.data]);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  const deleteMaster = async (id) => {
+    try {
+      await deleteMasterApi(id);
+      setMasters((prev) => prev.filter((m) => m._id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   };
-
-  const deleteMaster = (id) => {
-    setMasters(masters.filter((m) => m.id !== id));
-  };
-
   return (
     <div>
-
       <h2>Quản lý chủ trọ</h2>
-
       <MasterForm addMaster={addMaster} />
-
       <MasterTable masters={masters} deleteMaster={deleteMaster} />
-
     </div>
   );
 }

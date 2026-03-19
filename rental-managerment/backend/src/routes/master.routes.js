@@ -3,16 +3,36 @@ const router = express.Router();
 const Master = require("../models/Master");
 
 router.post("/", async (req, res) => {
-  const master = new Master(req.body);
-  await master.save();
-  res.json(master);
+  try{
+    const master = new Master(req.body);
+    await master.save();
+    const method = req.method
+    const time = new Date().toLocaleDateString()
+    console.log(`${time} [${method}] : new master` )
+    res.json(master);
+  } catch(err){
+      console.log("Error fetching users:",err)
+      res.status(500).json({error:"server error"})
+  }
+  
 });
-
 router.get("/", async (req, res) => {
   const masters = await Master.find();
   const method = req.method
-  console.log(`[${method}] : get master list`)
+  const time = new Date().toLocaleDateString()
+  console.log(`${time} [${method}] : get master list`)
   res.json(masters);
+});
+router.delete("/:id", async (req, res) => {
+  try {
+    await Master.findByIdAndDelete(req.params.id);
+    const method = req.method;
+    const time = new Date().toLocaleString(); 
+    console.log(`[${time}] [${method}] : Delete master`);
+    res.json({ message: "Deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
