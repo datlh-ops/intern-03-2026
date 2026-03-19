@@ -1,11 +1,7 @@
 export default function UserTable({ users, deleteUser }) {
-
     return (
-
         <div className="user-table">
-
             <table>
-
                 <thead>
                     <tr>
                         <th>Tên</th>
@@ -17,11 +13,8 @@ export default function UserTable({ users, deleteUser }) {
                 </thead>
 
                 <tbody>
-
                     {users.map(user => (
-
-                        <tr key={user.id}>
-
+                        <tr key={user._id}>
                             <td>{user.name}</td>
                             <td>{user.phone}</td>
                             <td>{user.room}</td>
@@ -33,24 +26,17 @@ export default function UserTable({ users, deleteUser }) {
                             </td>
 
                             <td>
-
                                 <button
                                     className="btn-delete"
-                                    onClick={() => deleteUser(user.id)}
+                                    onClick={() => deleteUser(user._id)}
                                 >
                                     Xóa
                                 </button>
-
                             </td>
-
                         </tr>
-
                     ))}
-
                 </tbody>
-
             </table>
-
         </div>
     );
 }
