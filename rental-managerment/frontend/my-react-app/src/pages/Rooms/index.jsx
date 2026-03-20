@@ -6,20 +6,54 @@ import "./rooms.css";
 
 export default function Rooms() {
 
-    const [rooms, setRooms] = useState(()=>{
-        const saved = localStorage.getItem("rooms");
-        return saved ? JSON.parse(saved) : []
-    });
-    useEffect(()=>{
-        localStorage.setItem("rooms",JSON.stringify(rooms))
-    },[rooms])
+    const [rooms, setRooms] = useState([]);
+    const [editingRoom, setEditingRoom] = useState(null);
 
-    const addRoom = (room) => {
-        setRooms([...rooms, room]);
+    const fetchRooms = async () => {
+        try {
+            const { getRooms } = await import("../../api/room.api");
+            const res = await getRooms();
+            setRooms(res.data);
+        } catch (error) {
+            console.error("Lỗi khi tải phòng", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchRooms();
+    }, [])
+
+    const addRoom = async (roomData) => {
+        try {
+            const { createRoom } = await import("../../api/room.api");
+            const res = await createRoom(roomData);
+            setRooms([...rooms, res.data]);
+        } catch (error) {
+            console.error("Lỗi thêm phòng", error);
+            alert("Lưu phòng thất bại! Vui lòng kiểm tra lại (có thể trùng số phòng).");
+        }
     };
 
-    const deleteRoom = (id) => {
-        setRooms(rooms.filter(r => r.id !== id));
+    const updateRoom = async (id, data) => {
+        try {
+            const { updateRoomApi, getRooms } = await import("../../api/room.api");
+            await updateRoomApi(id, data);
+            const res = await getRooms();
+            setRooms(res.data);
+            setEditingRoom(null);
+        } catch (error) {
+            console.error("Lỗi cập nhật phòng", error);
+        }
+    };
+
+    const deleteRoom = async (id) => {
+        try {
+            const { deleteRoomApi } = await import("../../api/room.api");
+            await deleteRoomApi(id);
+            setRooms(rooms.filter(r => r._id !== id));
+        } catch (error) {
+            console.error("Lỗi xóa phòng", error);
+        }
     };
 
     return (
@@ -30,9 +64,18 @@ export default function Rooms() {
 
             <RoomStats rooms={rooms} />
 
-            <RoomForm addRoom={addRoom} />
+            <RoomForm 
+                addRoom={addRoom} 
+                editingRoom={editingRoom}
+                updateRoom={updateRoom}
+                cancelEdit={() => setEditingRoom(null)}
+            />
 
-            <RoomTable rooms={rooms} deleteRoom={deleteRoom} />
+            <RoomTable 
+                rooms={rooms} 
+                deleteRoom={deleteRoom} 
+                onEdit={(room) => setEditingRoom(room)}
+            />
 
         </div>
 

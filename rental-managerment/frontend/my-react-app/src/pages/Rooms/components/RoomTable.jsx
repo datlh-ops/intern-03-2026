@@ -1,4 +1,4 @@
-export default function RoomTable({ rooms, deleteRoom }) {
+export default function RoomTable({ rooms, deleteRoom, onEdit }) {
 
     return (
 
@@ -8,11 +8,10 @@ export default function RoomTable({ rooms, deleteRoom }) {
 
                 <thead>
                     <tr>
-                        <th>Phòng</th>
-                        <th>Chủ trọ</th>
-                        <th>Giá</th>
+                        <th>Số phòng</th>
+                        <th>Giá (VNĐ)</th>
                         <th>Trạng thái</th>
-                        <th>Người thuê</th>
+                        <th>Sức chứa</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
@@ -21,24 +20,32 @@ export default function RoomTable({ rooms, deleteRoom }) {
 
                     {rooms.map(room => (
 
-                        <tr key={room.id}>
+                        <tr key={room._id || room.id}>
 
-                            <td>{room.name}</td>
-                            <td>{room.owner}</td>
-                            <td>{room.price}</td>
+                            <td>{room.roomNumber}</td>
+                            <td>{room.price ? room.price.toLocaleString() : "0"}</td>
 
                             <td>
-                                {room.status === "available"
+                                {room.status === "Trống"
                                     ? "🟢 Trống"
-                                    : "🔴 Đã thuê"}
+                                    : room.status === "Đã thuê"
+                                        ? "🔴 Đã thuê"
+                                        : "🟡 Bảo trì"}
                             </td>
 
-                            <td>{room.tenant}</td>
+                            <td>{room.capacity} người</td>
 
                             <td>
                                 <button
+                                    className="btn-edit"
+                                    onClick={() => onEdit(room)}
+                                    style={{ marginRight: '8px', backgroundColor: '#0ea5e9', color: '#fff', padding: '6px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                >
+                                    Sửa
+                                </button>
+                                <button
                                     className="btn-delete"
-                                    onClick={() => deleteRoom(room.id)}
+                                    onClick={() => deleteRoom(room._id || room.id)}
                                 >
                                     Xóa
                                 </button>

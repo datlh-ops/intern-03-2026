@@ -34,5 +34,15 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
+router.put("/:id", async (req, res) => {
+  try {
+    const updatedMaster = await Master.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const method = req.method;
+    const time = new Date().toLocaleString(); 
+    console.log(`[${time}] [${method}] : Update master`);
+    res.json(updatedMaster);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 module.exports = router;

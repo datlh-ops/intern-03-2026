@@ -1,4 +1,4 @@
-export default function UserTable({ users, deleteUser }) {
+export default function UserTable({ users, deleteUser, onEdit }) {
     return (
         <div className="user-table">
             <table>
@@ -26,6 +26,13 @@ export default function UserTable({ users, deleteUser }) {
                             </td>
 
                             <td>
+                                <button
+                                    className="btn-edit"
+                                    onClick={() => onEdit(user)}
+                                    style={{ marginRight: '8px', backgroundColor: '#0ea5e9', color: '#fff', padding: '6px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                                >
+                                    Sửa
+                                </button>
                                 <button
                                     className="btn-delete"
                                     onClick={() => deleteUser(user._id)}

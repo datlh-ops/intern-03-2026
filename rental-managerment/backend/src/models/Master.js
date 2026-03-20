@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const masterSchema = new mongoose.Schema({
   name: String,
-  phone : String,
+  phone: String,
   email: String,
   address: String
 });

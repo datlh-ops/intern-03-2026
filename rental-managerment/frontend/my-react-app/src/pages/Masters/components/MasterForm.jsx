@@ -1,34 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function MasterForm({ addMaster }) {
+export default function MasterForm({ addMaster, editingMaster, updateMaster, cancelEdit }) {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
 
+  useEffect(() => {
+    if (editingMaster) {
+      setName(editingMaster.name);
+      setPhone(editingMaster.phone);
+      setEmail(editingMaster.email);
+      setAddress(editingMaster.address);
+    } else {
+      setName("");
+      setPhone("");
+      setEmail("");
+      setAddress("");
+    }
+  }, [editingMaster]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newMaster = {
-      id: Date.now(),
+    const masterData = {
       name,
       phone,
       email,
       address
     };
-    addMaster(newMaster);
+
+    if (editingMaster) {
+      updateMaster(editingMaster._id || editingMaster.id, masterData);
+    } else {
+      addMaster(masterData);
+    }
     setName("");
     setPhone("");
     setEmail("");
     setAddress("");
   };
-
   return (
     <form onSubmit={handleSubmit} className="master-form">
-
-      <h3>Thêm chủ trọ</h3>
-
+      <h3>{editingMaster ? "Sửa chủ trọ" : "Thêm chủ trọ"}</h3>
       <input
         type="text"
         placeholder="Tên chủ trọ"
@@ -36,7 +51,6 @@ export default function MasterForm({ addMaster }) {
         onChange={(e) => setName(e.target.value)}
         required
       />
-
       <input
         type="text"
         placeholder="Số điện thoại"
@@ -44,7 +58,6 @@ export default function MasterForm({ addMaster }) {
         onChange={(e) => setPhone(e.target.value)}
         required
       />
-
       <input
         type="email"
         placeholder="Email"
@@ -52,7 +65,6 @@ export default function MasterForm({ addMaster }) {
         onChange={(e) => setEmail(e.target.value)}
         required
       />
-
       <input
         type="text"
         placeholder="Địa chỉ"
@@ -60,8 +72,14 @@ export default function MasterForm({ addMaster }) {
         onChange={(e) => setAddress(e.target.value)}
         required
       />
-
-      <button type="submit">Thêm</button>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button type="submit">{editingMaster ? "Cập nhật" : "Thêm"}</button>
+        {editingMaster && (
+          <button type="button" onClick={cancelEdit} style={{ backgroundColor: '#6c757d' }}>
+            Hủy
+          </button>
+        )}
+      </div>
 
     </form>
   );

@@ -3,9 +3,10 @@ import UserForm from "./components/UserForm";
 import UserTable from "./components/UserTable";
 import UserStats from "./components/UserStats";
 import "./users.css";
-import { getUsers, createUser,deleteUserApi } from "../../api/user.api";
+import { getUsers, createUser, deleteUserApi, updateUserApi } from "../../api/user.api";
 export default function Users() {
     const [users, setUsers] = useState([]);
+    const [editingUser, setEditingUser] = useState(null);
     const fetchUsers = async () => {
         try {
             const res = await getUsers();
@@ -33,6 +34,15 @@ export default function Users() {
             console.error(err);
         }
     };
+    const updateUser = async (id, data) => {
+        try {
+            await updateUserApi(id, data);
+            fetchUsers();
+            setEditingUser(null);
+        } catch (err) {
+            console.error(err);
+        }
+    };
     const deleteUser = async (id) => {
         try {
             await deleteUserApi(id);
@@ -45,8 +55,17 @@ export default function Users() {
         <div className="users-page">
             <h2>Quản lý người thuê</h2>
             <UserStats users={users} />
-            <UserForm addUser={addUser} />
-            <UserTable users={users} deleteUser={deleteUser} />
+            <UserForm 
+                addUser={addUser} 
+                editingUser={editingUser} 
+                updateUser={updateUser} 
+                cancelEdit={() => setEditingUser(null)} 
+            />
+            <UserTable 
+                users={users} 
+                deleteUser={deleteUser} 
+                onEdit={(user) => setEditingUser(user)} 
+            />
         </div>
     );
 }

@@ -7,10 +7,12 @@ import {
   getMasters,
   createMaster,
   deleteMaster as deleteMasterApi,
+  updateMasterApi
 } from "../../api/master.api";
 
 export default function Masters() {
   const [masters, setMasters] = useState([]);
+  const [editingMaster, setEditingMaster] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -31,6 +33,16 @@ export default function Masters() {
       console.error(err);
     }
   }
+  const updateMaster = async (id, data) => {
+    try {
+      await updateMasterApi(id, data);
+      const res = await getMasters();
+      setMasters(res.data);
+      setEditingMaster(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const deleteMaster = async (id) => {
     try {
       await deleteMasterApi(id);
@@ -42,8 +54,17 @@ export default function Masters() {
   return (
     <div>
       <h2>Quản lý chủ trọ</h2>
-      <MasterForm addMaster={addMaster} />
-      <MasterTable masters={masters} deleteMaster={deleteMaster} />
+      <MasterForm 
+        addMaster={addMaster} 
+        editingMaster={editingMaster}
+        updateMaster={updateMaster}
+        cancelEdit={() => setEditingMaster(null)}
+      />
+      <MasterTable 
+        masters={masters} 
+        deleteMaster={deleteMaster} 
+        onEdit={(master) => setEditingMaster(master)}
+      />
     </div>
   );
 }
