@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import ContractStats from "./components/ContractStats";
 import ContractForm from "./components/ContractForm";
 import ContractTable from "./components/ContractTable";
-import { getContracts, createContract, updateContractApi, deleteContractApi } from "../../api/contract.api";
+import { getContracts, createContract, updateContractApi, deleteContractApi } from "../../../api/contract.api";
 import "./contracts.css";
 
 export default function Contracts() {

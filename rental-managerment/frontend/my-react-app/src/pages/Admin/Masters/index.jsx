@@ -3,12 +3,7 @@ import MasterForm from "./components/MasterForm";
 import MasterTable from "./components/MasterTable";
 import "./master.css";
 
-import {
-  getMasters,
-  createMaster,
-  deleteMaster as deleteMasterApi,
-  updateMasterApi
-} from "../../api/master.api";
+import { getMasters, createMaster, deleteMaster as deleteMasterApi, updateMasterApi } from "../../../api/master.api";
 
 export default function Masters() {
   const [masters, setMasters] = useState([]);

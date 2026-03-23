@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { getUsers } from "../../../api/user.api";
-import { getRooms } from "../../../api/room.api";
+import { getUsers } from "../../../../api/user.api";
+import { getRooms } from "../../../../api/room.api";
 
 export default function ContractForm({ addContract, editingContract, updateContract, cancelEdit }) {
   const [users, setUsers] = useState([]);

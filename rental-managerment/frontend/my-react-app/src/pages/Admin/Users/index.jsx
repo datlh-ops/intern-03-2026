@@ -3,7 +3,7 @@ import UserForm from "./components/UserForm";
 import UserTable from "./components/UserTable";
 import UserStats from "./components/UserStats";
 import "./users.css";
-import { getUsers, createUser, deleteUserApi, updateUserApi } from "../../api/user.api";
+import { getUsers, createUser, deleteUserApi, updateUserApi } from "../../../api/user.api";
 export default function Users() {
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);

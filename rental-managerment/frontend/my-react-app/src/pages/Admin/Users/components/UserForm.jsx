@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getRooms } from "../../../api/room.api";
+import { getRooms } from "../../../../api/room.api";
 
 export default function UserForm({ addUser, editingUser, updateUser, cancelEdit }) {
     const [name, setName] = useState("");

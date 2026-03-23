@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getMasters } from "../../../api/master.api"; // API lấy thẻ Chủ trọ
+import { getMasters } from "../../../../api/master.api"; // API lấy thẻ Chủ trọ
 
 export default function RoomForm({ addRoom, editingRoom, updateRoom, cancelEdit }) {
 

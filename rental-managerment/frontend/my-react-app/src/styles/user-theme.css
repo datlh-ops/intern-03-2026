@@ -1,0 +1,178 @@
+/* src/styles/user-theme.css */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+.user-app-container {
+  display: flex;
+  background-color: #f8fafc; /* Nền sáng, mát mẻ */
+  min-height: 100vh;
+  font-family: 'Outfit', sans-serif;
+  color: #1e293b;
+}
+
+/* KHOẢNG SIDEBAR TRÁI */
+.user-sidebar {
+  width: 260px;
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+  z-index: 10;
+}
+
+.user-sidebar h2 {
+  padding: 30px 24px 20px;
+  margin: 0;
+  font-size: 1.5rem;
+  color: #3b82f6; /* Xanh đặc trưng */
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.user-sidebar ul {
+  list-style: none;
+  padding: 0 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-sidebar a {
+  text-decoration: none;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 14px 20px;
+  border-radius: 12px;
+  display: block;
+  transition: all 0.2s ease;
+}
+
+.user-sidebar a:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.user-sidebar a.active {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* PHẦN MAIN NỘI DUNG */
+.user-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+.user-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  padding: 24px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.user-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.user-btn-logout {
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #ef4444; /* Đỏ nhạt */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Outfit', sans-serif;
+}
+
+.user-btn-logout:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+/* KHU VỰC CHỨA COMPONENT (ROUTER) */
+.user-page-wrapper {
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.user-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+  margin-top: 0;
+}
+
+.user-subheading {
+  color: #64748b;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+/* GRID HIỂN THỊ DẠNG THẺ (CARDS) TRÔNG HIỆN ĐẠI HƠN TABLE ADMIN */
+.user-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.user-room-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  border: 1px solid #f1f5f9;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.user-room-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+}
+
+.user-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.user-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.user-room-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.user-room-card p {
+  margin: 8px 0;
+  color: #475569;
+  display: flex;
+  justify-content: space-between;
+}
+
+.user-room-card strong {
+  color: #0f172a;
+}

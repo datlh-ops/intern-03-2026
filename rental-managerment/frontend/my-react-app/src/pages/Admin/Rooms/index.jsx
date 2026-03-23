@@ -3,10 +3,10 @@ import RoomForm from "./components/RoomForm";
 import RoomTable from "./components/RoomTable";
 import RoomStats from "./components/RoomStats";
 import "./rooms.css";
-import { getRooms } from "../../api/room.api";
-import { createRoom } from "../../api/room.api";
-import { updateRoomApi } from "../../api/room.api";
-import { deleteRoomApi } from "../../api/room.api";
+import { getRooms } from "../../../api/room.api";
+import { createRoom } from "../../../api/room.api";
+import { updateRoomApi } from "../../../api/room.api";
+import { deleteRoomApi } from "../../../api/room.api";
 export default function Rooms() {
 
     const [rooms, setRooms] = useState([]);

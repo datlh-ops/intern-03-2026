@@ -1,0 +1,193 @@
+/* src/styles/master-theme.css */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+.master-app-container {
+  display: flex;
+  background-color: #0f172a; /* Nền xanh đậm siêu ngầu */
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #f8fafc;
+}
+
+/* KHOẢNG SIDEBAR TRÁI */
+.master-sidebar {
+  width: 280px;
+  background: #1e293b; /* Xanh nhạt hơn một chút */
+  border-right: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.master-sidebar h2 {
+  padding: 30px 24px 20px;
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fbbf24; /* Vàng hổ phách cao cấp (Amber) */
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-transform: uppercase;
+}
+
+.master-sidebar ul {
+  list-style: none;
+  padding: 0 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.master-sidebar a {
+  text-decoration: none;
+  color: #94a3b8;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 14px 20px;
+  border-radius: 12px;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.master-sidebar a:hover {
+  background: #334155;
+  color: #f8fafc;
+}
+
+.master-sidebar a.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+/* PHẦN MAIN NỘI DUNG */
+.master-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0f172a;
+}
+
+.master-header {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(12px);
+  padding: 24px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.master-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.master-btn-logout {
+  background: #ef4444; /* Đỏ dứt khoát */
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.master-btn-logout:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* KHU VỰC CHỨA COMPONENT */
+.master-page-wrapper {
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.master-heading {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 8px;
+  margin-top: 0;
+}
+
+.master-subheading {
+  color: #94a3b8;
+  margin-bottom: 30px;
+  font-size: 1.1rem;
+}
+
+/* GRID CHO CARD MASTER */
+.master-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.master-card {
+  background: #1e293b;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border: 1px solid #334155;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.master-card:hover {
+  transform: translateY(-5px);
+  border-color: #fbbf24;
+}
+
+.master-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  background: #334155;
+  color: #f8fafc;
+}
+
+.master-card h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.5rem;
+  color: #fbbf24;
+}
+
+.master-card p {
+  margin: 8px 0;
+  color: #cbd5e1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.master-card strong {
+  color: #f8fafc;
+}
+
+.master-btn-action {
+  background: transparent;
+  border: 1px solid #fbbf24;
+  color: #fbbf24;
+  padding: 10px 0;
+  width: 100%;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: all 0.3s;
+}
+
+.master-btn-action:hover {
+  background: #fbbf24;
+  color: #0f172a;
+}
