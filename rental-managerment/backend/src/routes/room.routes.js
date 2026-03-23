@@ -1,14 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const Room = require("../models/Room");
+const Master = require("../models/Master"); // Import để có thể xài validation nếu cần
 
 router.post("/", async (req, res) => {
   try {
     const room = new Room(req.body);
     await room.save();
-    const time = new Date().toLocaleString();
-    console.log(`[${time}] [${req.method}] : create room`);
-    res.json(room);
+
+    const populatedRoom = await Room.findById(room._id).populate("masterId", "name phone");
+    console.log(`[POST] : create room`);
+    res.json(populatedRoom);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -16,9 +18,8 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const rooms = await Room.find();
-    const time = new Date().toLocaleString();
-    console.log(`[${time}] [${req.method}] : get room list`);
+    const rooms = await Room.find().populate("masterId", "name phone");
+    console.log(`[GET] : get room list`);
     res.json(rooms);
   } catch (err) {
     console.error("Error fetching rooms:", err);
@@ -28,9 +29,9 @@ router.get("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const updatedRoom = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    const time = new Date().toLocaleString();
-    console.log(`[${time}] [${req.method}] : update room`);
+    const updatedRoom = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true })
+        .populate("masterId", "name phone");
+    console.log(`[PUT] : update room`);
     res.json(updatedRoom);
   } catch (err) {
     res.status(500).json({ error: err.message });

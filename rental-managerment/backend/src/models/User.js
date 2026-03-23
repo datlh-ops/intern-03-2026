@@ -11,10 +11,13 @@ const userSchema = new mongoose.Schema({
     required: [true, "Số điện thoại là bắt buộc"],
     match: [/^[0-9]{10,11}$/, "Số điện thoại không hợp lệ (10-11 chữ số)"]
   },
-  room: {
-    type: String,
-    required: [true, "Số phòng là bắt buộc"],
-    trim: true
+  roomId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Room"
+  },
+  isRepresentative: {
+    type: Boolean,
+    default: false
   },
   status: {
     type: String,
