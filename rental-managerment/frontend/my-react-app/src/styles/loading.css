@@ -1,0 +1,47 @@
+/* Tấm màng bọc phủ vô hình lên toàn bộ HTML web */
+.global-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.75); /* Màu trắng sữa trong suốt */
+  backdrop-filter: blur(2px); /* Hiệu ứng kính mờ (cực kỳ hiện đại) */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999; /* Chỉ số bọc trên cùng tuyệt đối (Vượt qua cả Navbar và Modal) */
+}
+
+/* Biểu tượng xoay vòng của Windows/Apple */
+.simple-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e5e7eb; /* Đường ray chạy tầu (Màu xám) */
+  border-top-color: #3b82f6; /* Đoàn tầu đầu kéo (Màu xanh) */
+  border-radius: 50%;
+  animation: spinner-rotate 0.8s linear infinite; /* Chuyến tầu xoay tròn vô tận */
+  margin-bottom: 12px;
+}
+
+/* Text Nhấp nháy "Đang tải" */
+.loading-text {
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  animation: blink-fade 1.5s infinite running;
+}
+
+/* Chuyển động xoay của vòng tròn */
+@keyframes spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+
+/* Chuyển động mờ dần của text */
+@keyframes blink-fade {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}

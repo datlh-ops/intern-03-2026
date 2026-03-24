@@ -19,6 +19,13 @@ const roomSchema = new mongoose.Schema({
     type: Number,
     default: 2
   },
+  currentTenants: {
+    type: Number,
+    default: 0
+  },
+  thumbnail: {
+    type: String,
+  },
   masterId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Master"
