@@ -22,11 +22,10 @@ export default function RoomModal({ isOpen, onClose, onSave, roomData, masterId 
     } else {
       setFormData({ roomNumber: '', price: '', status: 'Trống', capacity: 2, currentTenants: 0 });
     }
-    // Xóa bộ nhớ đệm ảnh cũ
     setImageFile(null);
   }, [roomData, isOpen]);
 
-  if (!isOpen) return null; // Nếu chưa vẫy gọi Modal, Không được load DOM
+  if (!isOpen) return null;
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -50,7 +49,6 @@ export default function RoomModal({ isOpen, onClose, onSave, roomData, masterId 
     if (imageFile) {
       data.append('image', imageFile);
     }
-
     onSave(data, roomData ? roomData._id : null);
   };
 

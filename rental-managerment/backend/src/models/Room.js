@@ -28,7 +28,8 @@ const roomSchema = new mongoose.Schema({
   },
   masterId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Master"
+    ref: "Master",
+    required: true
   }
 }, { timestamps: true });
 module.exports = mongoose.model("Room", roomSchema);

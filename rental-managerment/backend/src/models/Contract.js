@@ -11,6 +11,11 @@ const contractSchema = new mongoose.Schema({
     ref: "Room",
     required: [true, "Phòng là bắt buộc"]
   },
+  masterId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Master",
+    required: true
+  },
   price: {
     type: Number,
     required: [true, "Giá thuê là bắt buộc"]
@@ -25,8 +30,8 @@ const contractSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["active", "expired", "cancelled"],
-    default: "active"
+    enum: ["pending", "decline", "active", "expired", "cancelled"],
+    default: "pending"
   },
   deposit: {
     type: Number,

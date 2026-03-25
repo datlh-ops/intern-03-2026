@@ -17,7 +17,8 @@ const deleteImageFromCloudinary = async (imageUrl) => {
 
       //Gọi Cloudinary 
       await cloudinary.uploader.destroy(publicId);
-      console.log(`[Cloudinary] Đã xóa dọn rác ảnh đính kèm: ${publicId}`);
+      const time = new Date().toLocaleString();
+      console.log(`${time} [Cloudinary] Đã xóa dọn rác ảnh đính kèm: ${publicId}`);
     }
   } catch (err) {
     console.error("[Cloudinary Error] Lỗi dọn rác ảnh:", err.message);
