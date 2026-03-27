@@ -25,6 +25,11 @@ const accountSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Master",
         default: null
+    },
+    status: {
+        type: String,
+        enum: ["active", "inactive", "banned"],
+        default: "active"
     }
 }, { timestamps: true });
 

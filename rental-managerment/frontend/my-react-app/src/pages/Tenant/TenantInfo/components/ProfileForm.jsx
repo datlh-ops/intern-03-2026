@@ -1,58 +1,60 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { tenantProfileSchema } from '../../../../schemas/tenant.schema';
 
 export default function ProfileForm({ user, onSave, onCancel }) {
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    phone: user?.phone || '',
+  const [generalError, setGeneralError] = useState("");
+
+  const { register, handleSubmit, setValue, trigger, formState: { errors } } = useForm({
+    resolver: yupResolver(tenantProfileSchema),
+    defaultValues: {
+      name: user?.name || '',
+      phone: user?.phone || '',
+    },
   });
 
-  const nameInputRef = useRef(null);
-
-  useEffect(() => {
-    if (nameInputRef.current) {
-      nameInputRef.current.focus();
-    }
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+  const onInvalid = async (errors) => {
+    setGeneralError("Thông tin nhập vào không hợp lệ. Vui lòng kiểm tra lại!");
+    Object.keys(errors).forEach((field) => {
+      setValue(field, "");
     });
+    await trigger();
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
+  const onSubmit = (data) => {
+    setGeneralError("");
+    onSave(data);
   };
 
   return (
-    <form className="profile-card" onSubmit={handleSubmit}>
+    <form className="profile-card" onSubmit={handleSubmit(onSubmit, onInvalid)}>
+      <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '600' }}>Chỉnh sửa thông tin cá nhân</h3>
+
+      {generalError && <div className="form-general-error">{generalError}</div>}
+
       <div className="form-group">
         <label>Họ và tên:</label>
         <input 
           type="text" 
-          name="name" 
-          className="form-control"
-          value={formData.name} 
-          onChange={handleChange} 
-          ref={nameInputRef}
-          required 
+          className={`form-control ${errors.name ? "is-invalid" : ""}`}
+          placeholder="Nhập họ và tên"
+          {...register("name")}
         />
+        {errors.name && <span className="error-msg">{errors.name.message}</span>}
       </div>
+
       <div className="form-group">
         <label>Số điện thoại:</label>
         <input 
           type="text" 
-          name="phone" 
-          className="form-control"
-          value={formData.phone} 
-          onChange={handleChange} 
-          pattern="[0-9]{10,11}"
-          title="Vui lòng nhập 10-11 chữ số"
-          required 
+          className={`form-control ${errors.phone ? "is-invalid" : ""}`}
+          placeholder="0xxxxxxxxx"
+          {...register("phone")}
         />
+        {errors.phone && <span className="error-msg">{errors.phone.message}</span>}
       </div>
+
       <div className="form-group">
          <label>Trạng thái (Hệ thống cấp):</label>
          <input type="text" className="form-control" disabled value={user?.status === 'active' ? 'Đang hoạt động' : 'Đã khóa'} />

@@ -7,23 +7,7 @@ import * as yup from 'yup';
 import FormField from "../../components/Common/FormField";
 import { useState } from "react";
 
-const schema = yup.object({
-  username: yup.
-    string().
-    required('Vui lòng nhập tên').
-    trim().
-    matches(/^\S+$/, 'Tên không được chứa khoảng trắng').
-    min(6, 'Tên ít nhất 6 ký tự').
-    max(20, 'Tên nhiều nhất 20 ký tự'),
-  password: yup.
-    string().
-    required('Vui lòng nhập mật khẩu').
-    trim().
-    matches(/^\S+$/, 'Mật khẩu không được chứa khoảng trắng').
-    min(6, 'Mật khẩu ít nhất 6 ký tự').
-    max(20, 'Mật khẩu nhiều nhất 20 ký tự'),
-  role: yup.string().required('Vui lòng chọn vai trò'),
-}).required();
+import { registerSchema as schema } from '../../schemas/auth.schema';
 
 export default function Register() {
   const [generalError, setGeneralError] = useState("");
