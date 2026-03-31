@@ -38,6 +38,11 @@ const registerSchema = yup.object({
     .required("Vui lòng chọn vai trò"),
 });
 
+const googleSchema = yup.object({
+  credential: yup.string().required("Thiếu token xác thực từ Google"),
+  role: yup.string().oneOf(["admin", "master", "user"]).default("user")
+});
+
 class AuthDTO {
   static loginResponse(account, token) {
     const profileId = account.role === "master" ? account.masterId?._id : account.userId?._id;
@@ -73,6 +78,13 @@ class AuthDTO {
 
   static async loginRequest(data) {
     return await loginSchema.validate(data, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+  }
+
+  static async googleRequest(data) {
+    return await googleSchema.validate(data, {
       abortEarly: false,
       stripUnknown: true,
     });

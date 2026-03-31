@@ -9,7 +9,21 @@ const accountSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, "Mật khẩu là bắt buộc"]
+        required: function () {
+            return !this.googleId;
+        }
+    },
+    googleId: {
+        type: String,
+        sparse: true,
+        unique: true
+    },
+    email: {
+        type: String,
+        trim: true
+    },
+    avatar: {
+        type: String
     },
     role: {
         type: String,

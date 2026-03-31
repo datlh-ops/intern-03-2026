@@ -6,5 +6,6 @@ const authDto = require("../dtos/auth.dto");
 
 router.post("/register", validate(authDto.registerRequest), authController.register);
 router.post("/login", validate(authDto.loginRequest), authController.login);
+router.post("/google", validate(authDto.googleRequest), authController.google);
 
 module.exports = router;

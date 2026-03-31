@@ -24,7 +24,6 @@ const checkRole = (allowedRoles) => {
         next();
     };
 };
-
 module.exports = {
     verifyToken,
     checkRole

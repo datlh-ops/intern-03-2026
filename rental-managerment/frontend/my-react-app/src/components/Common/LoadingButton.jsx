@@ -1,9 +1,10 @@
 import { Button } from "@mui/material";
 
-export default function AuthSubmitButton({
+export default function LoadingButton({
   isSubmitting,
   label,
   sx = {},
+  ...props
 }) {
   return (
     <Button
@@ -18,6 +19,7 @@ export default function AuthSubmitButton({
         fontSize: "1rem",
         ...sx,
       }}
+      {...props}
     >
       {label}
     </Button>

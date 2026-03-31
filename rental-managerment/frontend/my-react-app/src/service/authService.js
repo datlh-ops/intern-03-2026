@@ -15,3 +15,11 @@ export async function register(username, password, role) {
   });
   return response.data;
 }
+
+export async function loginWithGoogle(credential, role = "user") {
+  const response = await axiosClient.post("/auth/google", {
+    credential,
+    role
+  });
+  return response.data;
+}

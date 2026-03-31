@@ -1,13 +1,13 @@
 import React from "react";
 
-const FormField = ({ label, name, type = "text", register, error, options, placeholder }) => {
+const FormField = ({ label, name, type = "text", register, error, options, placeholder, disabled }) => {
 
-  const inputClass = `auth-input ${error ? "input-error" : ""}`;
+  const inputClass = `auth-input ${error ? "input-error" : ""} ${disabled ? "form-disabled" : ""}`;
 
   const renderInputControl = () => {
     if (type === "select") {
       return (
-        <select id={name} className={inputClass} {...register(name)}>
+        <select id={name} className={inputClass} {...register(name)} disabled={disabled}>
           {options?.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
@@ -24,12 +24,13 @@ const FormField = ({ label, name, type = "text", register, error, options, place
         className={inputClass}
         placeholder={placeholder}
         {...register(name)}
+        disabled={disabled}
       />
     );
   };
 
   return (
-    <div className="input-group">
+    <div className="form-group-rm">
       {label && <label htmlFor={name}>{label}</label>}
 
       {renderInputControl()}

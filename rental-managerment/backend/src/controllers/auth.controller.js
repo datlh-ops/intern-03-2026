@@ -21,6 +21,17 @@ class AuthController {
       res.status(statusCode).json({ error: err.message });
     }
   }
+
+  async google(req, res) {
+    try {
+      const { credential, role } = req.body;
+      const result = await authService.googleLogin(credential, role);
+      res.json(result);
+    } catch (err) {
+      console.error(err);
+      res.status(401).json({ error: "Xác thực Google thất bại hoặc email không hợp lệ" });
+    }
+  }
 }
 
 module.exports = new AuthController();

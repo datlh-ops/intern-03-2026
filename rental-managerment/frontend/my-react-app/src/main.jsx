@@ -3,13 +3,27 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { LoadingProvider } from './context/LoadingContext.jsx'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const GOOGLE_CLIENT_ID = "926759738992-1ttl3iq35oac6rkrlirfjj1ffjof1rh1.apps.googleusercontent.com";
+
+const theme = createTheme({
+  typography: {
+    fontFamily: '"Libre Franklin", "Outfit", sans-serif',
+  },
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <LoadingProvider>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </LoadingProvider>
-  </StrictMode>,
+    <ThemeProvider theme={theme}>
+      <LoadingProvider>
+        <AuthProvider>
+          <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+            <App />
+          </GoogleOAuthProvider>
+        </AuthProvider>
+      </LoadingProvider>
+    </ThemeProvider>
+  </StrictMode>
 )

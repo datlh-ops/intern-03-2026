@@ -1,6 +1,6 @@
 import { Snackbar, Alert } from "@mui/material";
 
-export default function AuthToast({
+export default function Toast({
   open,
   onClose,
   message,
