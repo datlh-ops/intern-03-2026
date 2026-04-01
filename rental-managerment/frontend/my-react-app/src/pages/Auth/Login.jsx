@@ -193,13 +193,13 @@ export default function Login() {
             </Divider>
 
             <Stack direction="row" spacing={2} sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={() => setGeneralError('Lỗi kết nối tới Server của Google.')}
-                  theme="filled_black"
-                  shape="rectangular"
-                  width="100%"
-                />
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setGeneralError('Lỗi kết nối tới Server của Google.')}
+                theme="filled_black"
+                shape="rectangular"
+                width="100%"
+              />
             </Stack>
 
             <Typography variant="body2" align="center" sx={{ color: 'rgba(255,255,255,0.6)' }}>
@@ -209,12 +209,6 @@ export default function Login() {
               </Link>
             </Typography>
           </Box>
-        </Box>
-
-        <Box sx={s.footer}>
-          <Typography variant="caption" sx={{ color: '#fff' }}>PRIVACY POLICY</Typography>
-          <Typography variant="caption" sx={{ color: '#fff' }}>TERMS OF SERVICE</Typography>
-          <Typography variant="caption" sx={{ color: '#fff' }}>SUPPORT</Typography>
         </Box>
       </Box>
 

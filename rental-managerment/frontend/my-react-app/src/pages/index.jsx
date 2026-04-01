@@ -2,6 +2,7 @@ export { default as Dashboard } from "./Admin/Dashboard";
 export { default as MasterDashboard } from "./Master/MasterDashboard";
 export { default as MasterRooms } from "./Master/MasterRooms";
 export { default as MasterContracts } from "./Master/MasterContracts";
+export { default as MasterProfile } from "./Master/MasterProfile";
 export { default as TenantInfo } from "./Tenant/TenantInfo";
 export { default as TenantRooms } from "./Tenant/TenantRooms";
 export { default as TenantContracts } from "./Tenant/TenantContracts";

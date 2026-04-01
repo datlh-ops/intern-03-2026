@@ -1,20 +1,53 @@
 import { NavLink } from "react-router-dom";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import BusinessIcon from '@mui/icons-material/Business';
 
 export default function MasterSidebar() {
+  const navItems = [
+    { to: "/master", icon: <DashboardIcon fontSize="small" />, label: "Trang chủ", end: true },
+    { to: "/master/rooms", icon: <MeetingRoomIcon fontSize="small" />, label: "Phòng", end: false },
+    { to: "/master/contracts", icon: <AssignmentIcon fontSize="small" />, label: "Hợp đồng", end: false },
+    { to: "/master/profile", icon: <AccountCircleIcon fontSize="small" />, label: "Hồ sơ", end: false },
+  ];
+
   return (
-    <div className="master-sidebar">
-      <h2>MASTER PANEL</h2>
-      <ul>
-        <li>
-          <NavLink to="/master" end>Tổng quan</NavLink>
-        </li>
-        <li>
-          <NavLink to="/master/rooms">Phòng của tôi</NavLink>
-        </li>
-        <li>
-          <NavLink to="/master/contracts">Hợp đồng của tôi</NavLink>
-        </li>
-      </ul>
-    </div>
+    <aside className="w-64 h-screen fixed left-0 top-0 bg-white border-r border-slate-200 flex flex-col z-50">
+      {/* Sidebar Logo */}
+      <div className="p-8 flex items-center gap-3">
+        <div className="w-10 h-10 bg-blue-600 rounded flex items-center justify-center text-white shadow-lg shadow-blue-500/20 transition-transform hover:scale-105">
+          <BusinessIcon />
+        </div>
+        <div>
+          <h2 className="text-xl font-extrabold text-slate-900 leading-tight">Chủ trọ</h2>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Cổng quản trị</p>
+        </div>
+      </div>
+
+      {/* Navigation Links */}
+      <nav className="flex-1 px-4 space-y-1">
+        <ul>
+          {navItems.map((item) => (
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) => `
+                  flex items-center gap-3 px-4 py-3 rounded text-sm font-bold transition-all duration-200
+                  ${isActive
+                    ? "bg-blue-50 text-blue-600 shadow-sm"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}
+                `}
+              >
+                <div className="opacity-70">{item.icon}</div>
+                <span>{item.label}</span>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
   );
 }

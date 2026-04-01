@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import AdminLayout from "./components/Layouts/AdminLayout";
 import MasterLayout from "./components/Layouts/MasterLayout";
 import UserLayout from "./components/Layouts/UserLayout";
@@ -8,13 +9,14 @@ import {
   Dashboard, MasterDashboard, TenantInfo,
   TenantRooms, TenantContracts,
   MasterRooms, MasterContracts,
-  Masters, Rooms, Users, Contracts, Login, Register
+  Masters, Rooms, Users, Contracts, Login, Register, MasterProfile
 } from "./pages";
-import "./styles/layout.css";
+import "./index.css";
 
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" reverseOrder={false} />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -45,6 +47,7 @@ function App() {
           <Route index element={<MasterDashboard />} />
           <Route path="rooms" element={<MasterRooms />} />
           <Route path="contracts" element={<MasterContracts />} />
+          <Route path="profile" element={<MasterProfile />} />
         </Route>
 
         <Route

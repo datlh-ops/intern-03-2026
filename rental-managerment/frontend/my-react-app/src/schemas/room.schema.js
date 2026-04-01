@@ -1,10 +1,12 @@
 import * as yup from 'yup';
 
 export const roomSchema = yup.object({
+
     title: yup
         .string()
         .required("Tiêu đề là bắt buộc")
         .trim()
+        .matches(/^[a-zA-ZÀ-ỹ0-9\s,.\-\!\(\)\/]*$/, "Tiêu đề không được chứa ký tự đặc biệt")
         .min(1, "Tiêu đề không được để trống")
         .max(100, "Tiêu đề không được vượt quá 100 ký tự"),
     city: yup
@@ -41,6 +43,7 @@ export const roomSchema = yup.object({
         .max(100, "Diện tích phải nhỏ hơn 100"),
     roomNumber: yup
         .string()
+        .matches(/^[A-Za-z0-9.-]+$/, "Số phòng chỉ được chứa chữ, số, dấu chấm (.) hoặc gạch ngang (-)")
         .required('Số phòng là bắt buộc')
         .trim()
         .min(1, 'Số phòng không được để trống'),
@@ -61,7 +64,7 @@ export const roomSchema = yup.object({
         .integer('Sức chứa phải là số nguyên')
         .required('Nhập sức chứa')
         .min(1, 'Sức chứa tối thiểu là 1 người')
-        .max(5, "Sức chứa tối đa là 5 người")
+        .max(8, "Sức chứa tối đa là 8 người")
         .default(2),
     currentTenants: yup
         .number()
@@ -84,10 +87,10 @@ export const roomSchema = yup.object({
             }
         ),
     status: yup
-        .string()
+        .number()
         .oneOf(
-            ['Trống', 'Đang xử lý', 'Đã thuê', 'Bảo trì'],
+            [0, 1, 2, 3],
             'Trạng thái phòng không hợp lệ'
         )
-        .default('Trống'),
+        .default(0),
 }).required();
