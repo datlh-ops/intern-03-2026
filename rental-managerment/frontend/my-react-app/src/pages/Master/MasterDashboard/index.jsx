@@ -10,35 +10,27 @@ import QuickActions from './components/QuickActions';
 
 const MasterDashboard = () => {
   const { userProfile: user } = useAuth();
-  const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [range, setRange] = useState(6);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      if (!user?.id) return;
-      try {
-        setLoading(true);
-        const res = await getMasterStats(user.id, range);
-        setDashboardData(res.data);
-      } catch (err) {
-        console.error("Lỗi lấy dữ liệu dashboard:", err);
-        toast.error("Không thể tải dữ liệu thống kê từ máy chủ");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
+    if (!user) return;
+    getMasterStats(user.id, range).then((res) => {
+      setDashboardData(res.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+    // const fetchStats = async () => {
+    //   try {
+    //     const res = await getMasterStats(user.id, range);
+    //     setDashboardData(res.data);
+    //   } catch (err) {
+    //     console.error("Lỗi lấy dữ liệu dashboard:", err);
+    //     toast.error("Không thể tải dữ liệu thống kê từ máy chủ");
+    //   }
+    // };
+    // fetchStats();
   }, [user, range]);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] gap-4">
-        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded animate-spin"></div>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse font-sans">Đang đồng bộ dữ liệu...</p>
-      </div>
-    );
-  }
 
   const { stats, expiringSoon, chartData } = dashboardData || {};
 

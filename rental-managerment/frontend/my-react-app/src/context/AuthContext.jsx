@@ -1,6 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { getUserById } from '../api/user.api';
-import { getMasterById } from '../api/master.api';
+import { logoutUser } from '../service/authService';
 
 const AuthContext = createContext();
 
@@ -8,73 +7,85 @@ export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [errorCtx, setErrorCtx] = useState('');
 
-  // Hàm load profile độc lập để có thể gọi lại bất cứ lúc nào (lúc F5 trang, hoặc lúc Login thành công)
   const loadProfile = async (storedUser) => {
     try {
-      setLoading(true);
       setErrorCtx('');
 
       const { profileId, role } = storedUser;
 
-      // Nếu không có profileId, người dùng này chưa được gắn thông tin cá nhân.
       if (!profileId) {
         setErrorCtx("Hồ sơ tài khoản chưa được thiết lập. Vui lòng liên hệ Admin.");
-        setLoading(false);
         return;
       }
 
-      let response;
-      if (role === 'master') {
-        response = await getMasterById(profileId);
-      } else {
-        response = await getUserById(profileId);
-      }
-
-      setUserProfile(response.data);
+      // 0-API F5 LOAD: Thiết lập Dữ liệu trực tiếp từ Bụng của Cookie (Fat Cookie)
+      setUserProfile({
+        ...storedUser
+      });
     } catch (err) {
       console.error("Lỗi khi fetch Context Data:", err);
+      alert("Lỗi LoadProfile: " + (err.response?.data?.error || err.message));
+
       setErrorCtx("Đã xảy ra lỗi hệ thống khi tải dữ liệu hồ sơ chung.");
-    } finally {
-      setLoading(false);
+
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setUserProfile(null);
+        document.cookie = 'ui_state=; Max-Age=-99999999; path=/';
+        window.location.href = "/login";
+      }
     }
   };
-
-  // Tự động khôi phục ngữ cảnh khi F5 / Tải lại trang web
   useEffect(() => {
-    const storedUserStr = localStorage.getItem('user');
-    if (storedUserStr) {
-      loadProfile(JSON.parse(storedUserStr));
+    const getUiStateCookie = () => {
+      const match = document.cookie.match(new RegExp('(^| )ui_state=([^;]+)'));
+      if (match) {
+        try {
+          const decodedCookie = decodeURIComponent(match[2]);
+          const binString = atob(decodedCookie);
+          const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
+          return JSON.parse(new TextDecoder().decode(bytes));
+        } catch (e) {
+          return null;
+        }
+      }
+      return null;
+    };
+
+    const basicUserData = getUiStateCookie();
+
+    if (basicUserData) {
+      loadProfile(basicUserData).finally(() => setIsInitializing(false));
     } else {
-      setLoading(false);
+      setIsInitializing(false);
     }
   }, []);
 
-  // Thay thế thao tác thủ công của Component Login bằng thao tác quản lý bởi Context
   const loginContext = async (userData) => {
-    localStorage.setItem("token", userData.token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    // Yêu cầu Context chọc xuống DB lấy profile chi tiết ngay lập tức
-    await loadProfile(userData);
+    if (userData && userData.user) {
+      await loadProfile(userData.user);
+    }
   };
 
-  const logoutContext = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUserProfile(null);
+  const logoutContext = async () => {
+    try {
+      await logoutUser();
+    } finally {
+      setUserProfile(null);
+      window.location.href = "/login";
+    }
   };
 
   const updateProfileContext = (updatedData) => {
-    // Chỉ cập nhật trạng thái UI trên RAM để tối ưu tốc độ, không cần gọi F12 GET DB lại.
     setUserProfile(prev => ({ ...prev, ...updatedData }));
   };
 
   return (
     <AuthContext.Provider value={{
       userProfile,
-      loading,
+      isInitializing,
       errorCtx,
       loginContext,
       logoutContext,

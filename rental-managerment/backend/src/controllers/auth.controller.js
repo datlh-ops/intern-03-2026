@@ -14,10 +14,31 @@ class AuthController {
     try {
       const { username, password } = req.body;
       const result = await authService.login(username, password);
+
+      // Set token to HttpOnly Cookie
+      if (result.token) {
+        res.cookie('token', result.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+        const uiState = JSON.stringify(result.user);
+
+        res.cookie('ui_state', Buffer.from(uiState).toString('base64'), { // Mã hóa Base64 cho gọn
+          httpOnly: false, // Để React JS có thể đọc bằng document.cookie
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
+        delete result.token; // Remove from JSON payload for security
+      }
+
       res.json(result);
     } catch (err) {
-      const statusCode = err.message === "Tài khoản không tồn tại" ? 404 : 
-                        err.message === "Mật khẩu không chính xác" ? 401 : 500;
+      const statusCode = err.message === "Tài khoản không tồn tại" ? 404 :
+        err.message === "Mật khẩu không chính xác" ? 401 : 500;
       res.status(statusCode).json({ error: err.message });
     }
   }
@@ -26,6 +47,28 @@ class AuthController {
     try {
       const { credential, role } = req.body;
       const result = await authService.googleLogin(credential, role);
+
+      // Set token to HttpOnly Cookie
+      if (result.token) {
+        res.cookie('token', result.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        });
+
+        const uiState = JSON.stringify(result.user);
+
+        res.cookie('ui_state', Buffer.from(uiState).toString('base64'), {
+          httpOnly: false,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        delete result.token; // Remove from JSON payload for security
+      }
+
       res.json(result);
     } catch (err) {
       console.error(err);
@@ -41,9 +84,23 @@ class AuthController {
       res.json(result);
     } catch (err) {
       const statusCode = err.message.includes("không chính xác") ? 401 :
-                        err.message.includes("không tồn tại") ? 404 : 400;
+        err.message.includes("không tồn tại") ? 404 : 400;
       res.status(statusCode).json({ error: err.message });
     }
+  }
+
+  async logout(req, res) {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    res.clearCookie('ui_state', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    res.json({ message: "Đăng xuất thành công" });
   }
 }
 

@@ -23,7 +23,7 @@ export default function AvatarSection({ user, roleLabel, badgeColor = "blue-600"
       </div>
 
       <h3 className="text-2xl font-black text-slate-900 mb-1 tracking-tight">{user?.name}</h3>
-      <p className={`text-xs font-black text-${badgeColor} uppercase tracking-[0.25em] mb-8`}>{roleLabel === "Chủ trọ" ? "CHỦ SỞ HỮU DIAMOND" : "NGƯỜI THUÊ CHÍNH CHỦ"}</p>
+      <p className={`text-xs font-black text-${badgeColor} uppercase tracking-[0.25em] mb-8`}>{roleLabel === "Chủ trọ" ? "CHỦ SỞ HỮU" : "NGƯỜI THUÊ"}</p>
 
       <div className="w-full space-y-4 pt-6 border-t border-slate-50">
         <div className="flex justify-between items-center text-xs">

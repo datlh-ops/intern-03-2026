@@ -18,7 +18,7 @@ export default function MasterRooms() {
     totalPages,
     stats,
     filterStatus,
-    setFilterStatus,
+    handleFilterChange,
     currentPage,
     setCurrentPage,
     deleteModal,
@@ -28,7 +28,7 @@ export default function MasterRooms() {
 
   const StatBox = ({ title, value, filterVal, colorClass, activeBorder }) => (
     <div
-      onClick={() => setFilterStatus(filterVal)}
+      onClick={() => handleFilterChange(filterVal)}
       className={`bg-white p-6 rounded-xl border-2 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md
         ${filterStatus === filterVal ? activeBorder : 'border-slate-100 hover:border-slate-200'}`}
     >
@@ -135,7 +135,6 @@ export default function MasterRooms() {
           </div>
         </div>
       </div>
-
 
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}

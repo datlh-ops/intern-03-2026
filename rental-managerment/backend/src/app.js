@@ -1,13 +1,15 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const { connectDB } = require("./config/db");
 const { verifyToken } = require("./middleware/auth.middleware");
 
 const app = express();
 connectDB();
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 app.use("/auth", require("./routes/auth.routes"));
 app.use("/users", verifyToken, require("./routes/user.routes"));
 app.use("/masters", verifyToken, require("./routes/master.routes"));

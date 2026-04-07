@@ -60,7 +60,7 @@ class AuthService {
 
   async login(username, password) {
     const accountRepo = AppDataSource.getRepository("Account");
-    const account = await accountRepo.findOne({ 
+    const account = await accountRepo.findOne({
       where: { username },
       relations: ["user", "master"]
     });
@@ -68,14 +68,12 @@ class AuthService {
     if (!account) {
       throw new Error("Tài khoản không tồn tại");
     }
-
     const isMatch = await bcrypt.compare(password, account.password);
     if (!isMatch) {
       throw new Error("Mật khẩu không chính xác");
     }
-
     const profileId = account.role === "master" ? account.masterId : account.userId;
-    
+
     // Tạo token payload
     const token = jwt.sign(
       {
@@ -86,7 +84,6 @@ class AuthService {
       JWT_SECRET,
       { expiresIn: "1d" }
     );
-
     return authDto.loginResponse(account, token);
   }
 
@@ -103,7 +100,7 @@ class AuthService {
     const { sub: googleId, email, name, picture } = payload;
 
     // Tìm bằng googleId hoặc email. TypeORM query syntax $or is array of objects
-    let account = await accountRepo.findOne({ 
+    let account = await accountRepo.findOne({
       where: [
         { googleId },
         { email }
@@ -149,7 +146,7 @@ class AuthService {
       });
 
       account = await accountRepo.save(newAccount);
-      
+
       // Reload relations
       account = await accountRepo.findOne({
         where: { id: account.id },
@@ -194,7 +191,7 @@ class AuthService {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
-    
+
     account.password = hashedPassword;
     await accountRepo.save(account);
 

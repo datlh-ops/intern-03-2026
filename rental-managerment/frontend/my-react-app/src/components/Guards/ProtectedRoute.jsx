@@ -1,23 +1,18 @@
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ProtectedRoute({ children, allowedRoles }) {
-  const token = localStorage.getItem("token");
-  const userStr = localStorage.getItem("user");
-  let user = null;
+  const { userProfile, isInitializing } = useAuth();
 
-  if (userStr) {
-    try {
-      user = JSON.parse(userStr);
-    } catch (e) {
-      console.error("Error parsing user from localStorage", e);
-    }
+  if (isInitializing) {
+    return null; // Chờ API /auth/me kiểm tra Cookie xong
   }
 
-  if (!token || !user) {
+  if (!userProfile) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && !allowedRoles.includes(userProfile.role)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

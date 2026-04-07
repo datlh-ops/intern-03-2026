@@ -11,7 +11,6 @@ import {
   Box, Typography, Button,
   Alert, Link, Divider, Stack, CssBaseline
 } from "@mui/material";
-import GoogleIcon from '@mui/icons-material/Google';
 import LabeledTextField from '../../components/Common/LabeledTextField';
 import LoadingButton from '../../components/Common/LoadingButton';
 

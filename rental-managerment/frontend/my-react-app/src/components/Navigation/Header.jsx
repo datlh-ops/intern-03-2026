@@ -1,15 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from "../../context/AuthContext";
 
 export default function Header() {
   const navigate = useNavigate();
-  const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
+  const { userProfile, logoutContext } = useAuth();
+  const user = userProfile;
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
+  const handleLogout = async () => {
+    await logoutContext();
   };
 
   return (

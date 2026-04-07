@@ -5,10 +5,12 @@ import toast from 'react-hot-toast';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import DeleteConfirmModal from '../../../components/Common/DeleteConfirmModal';
 import ContractModal from '../../../components/Common/Contracts/ContractModal';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function SharedContractsPage() {
+  const { userProfile } = useAuth();
+  const userRole = userProfile?.role || 'user';
   const [contracts, setContracts] = useState([]);
-  const [userRole, setUserRole] = useState(null);
   const [viewerModal, setViewerModal] = useState({
     isOpen: false,
     contract: null
@@ -20,19 +22,6 @@ export default function SharedContractsPage() {
     title: '',
     message: ''
   });
-
-  // Get user role from local storage
-  useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        setUserRole(user.role);
-      } catch (e) {
-        console.error("Error parsing user role", e);
-      }
-    }
-  }, []);
 
   const fetchContracts = async () => {
     try {

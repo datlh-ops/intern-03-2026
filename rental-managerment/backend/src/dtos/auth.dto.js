@@ -55,18 +55,14 @@ const changePasswordSchema = yup.object({
 class AuthDTO {
   static loginResponse(account, token) {
     const profileId = account.role === "master" ? account.master?.id : account.user?.id;
-    const profileName =
-      account.role === "master" && account.master
-        ? account.master.name
-        : account.role === "user" && account.user
-          ? account.user.name
-          : account.username;
+    const profileData = account.role === "master" ? (account.master || {}) : (account.user || {});
 
     const userData = {
-      id: account.id,
+      ...profileData,
+      accountId: account.id,
+      id: profileData.id || account.id, // Giữ id gốc của profile, fallback về account
       username: account.username,
       role: account.role,
-      name: profileName,
       profileId: profileId,
     };
 
@@ -74,7 +70,6 @@ class AuthDTO {
       message: "Đăng nhập thành công",
       token: token,
       user: userData,
-      ...userData,
     };
   }
 

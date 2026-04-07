@@ -4,11 +4,10 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const verifyToken = (req, res, next) => {
     try {
-        const tokenRaw = req.headers.authorization;
-        if (!tokenRaw || !tokenRaw.startsWith("Bearer ")) {
+        const token = req.cookies?.token;
+        if (!token) {
             return res.status(401).json({ error: "Access Denied. Vui lòng đăng nhập!" });
         }
-        const token = tokenRaw.split(" ")[1];
         const decoded = jwt.verify(token, JWT_SECRET);
         req.user = decoded;
         next();

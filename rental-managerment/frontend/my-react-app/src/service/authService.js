@@ -23,3 +23,8 @@ export async function loginWithGoogle(credential, role = "user") {
   });
   return response.data;
 }
+
+export async function logoutUser() {
+  const response = await axiosClient.post("/auth/logout");
+  return response.data;
+}

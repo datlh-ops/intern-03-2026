@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { getRoomsByMaster, createRoom, updateRoomApi, deleteRoomApi } from '../api/room.api';
+import { getRoomsByMaster, deleteRoomApi } from '../api/room.api';
 
 export function useMasterRooms(userProfile) {
   // Data State
@@ -14,49 +14,47 @@ export function useMasterRooms(userProfile) {
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 5;
 
-
   // UI State: Delete Modal
   const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
 
-  // 1. Core Fetching Logic (Server-side)
+  // 1. Core Fetching Logic
   const fetchRooms = useCallback(async () => {
     if (!userProfile?.id) return;
     try {
       const res = await getRoomsByMaster(userProfile.id, {
         page: currentPage,
-        limit,
+        limit: limit,
         status: filterStatus
       });
-
       const { rooms: data, total, totalPages: pages, stats: dashboardStats } = res.data;
-      setRooms(data);
-      setTotalItems(total);
-      setTotalPages(pages);
-      setStats(dashboardStats);
+      setRooms(data || []);
+      setTotalItems(total || 0);
+      setTotalPages(pages || 1);
+      setStats(dashboardStats || { total: 0, occupied: 0, vacant: 0, pending: 0, maintenance: 0 });
     } catch (err) {
       console.error("Lỗi fetch rooms:", err);
       toast.error("Không thể tải danh sách phòng.");
     }
-  }, [userProfile?.id, currentPage, filterStatus, limit]);
+  }, [userProfile, currentPage, filterStatus]);
 
   // Trigger fetch when dependency changes
   useEffect(() => {
     fetchRooms();
   }, [fetchRooms]);
 
-  // Reset to page 1 whenever filter changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filterStatus]);
-
+  // 2. Optimized Filter Change (Prevents double fetch)
+  const handleFilterChange = (newStatus) => {
+    setFilterStatus(newStatus);
+    setCurrentPage(1); // React 18 will batch these updates and trigger fetchRooms only once
+  };
 
   // 3. Delete logic
   const handleConfirmDelete = async () => {
-    if (!deleteModal.id) return;
+    if (!deleteModal?.id) return;
     try {
       await deleteRoomApi(deleteModal.id);
       toast.success("Đã xóa phòng khỏi hệ thống!");
-      fetchRooms(); // Reload from server
+      fetchRooms();
     } catch (err) {
       toast.error("Xóa thất bại! Vui lòng thử lại.");
     } finally {
@@ -65,12 +63,12 @@ export function useMasterRooms(userProfile) {
   };
 
   return {
-    rooms, // This is already paginated by the server
+    rooms,
     totalItems,
     totalPages,
     stats,
     filterStatus,
-    setFilterStatus,
+    handleFilterChange,
     currentPage,
     setCurrentPage,
     deleteModal,

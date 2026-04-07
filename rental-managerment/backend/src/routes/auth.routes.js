@@ -9,5 +9,6 @@ router.post("/register", validate(authDto.registerRequest), authController.regis
 router.post("/login", validate(authDto.loginRequest), authController.login);
 router.post("/google", validate(authDto.googleRequest), authController.google);
 router.post("/change-password", verifyToken, validate(authDto.changePasswordRequest), authController.changePassword.bind(authController));
+router.post("/logout", authController.logout);
 
 module.exports = router;
