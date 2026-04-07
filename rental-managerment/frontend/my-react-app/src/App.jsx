@@ -9,7 +9,7 @@ import {
   Dashboard, MasterDashboard, TenantInfo,
   TenantRooms, SharedContracts,
   MasterRooms,
-  Masters, Rooms, Users, Contracts, Login, Register, MasterProfile, RoomFormPage, RoomDetailPage
+  Masters, Rooms, Users, Contracts, Login, Register, MasterProfile, RoomFormPage, RoomDetailPage, TenantDashboard
 } from "./pages";
 import "./index.css";
 
@@ -60,7 +60,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<div className="font-black text-slate-400 text-xs uppercase tracking-widest p-10">Đang phát triển Trang chủ Người thuê...</div>} />
+          <Route index element={<TenantDashboard />} />
           <Route path="rooms" element={<TenantRooms />} />
           <Route path="rooms/:id" element={<RoomDetailPage />} />
           <Route path="contracts" element={<SharedContracts />} />

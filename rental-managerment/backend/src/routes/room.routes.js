@@ -7,6 +7,7 @@ const validate = require("../middleware/validation.middleware");
 const roomDto = require("../dtos/room.dto");
 
 router.get("/", roomController.getAllRooms);
+router.get("/trending", roomController.getTrendingRooms);
 router.get("/random", roomController.getRandomRooms);
 router.get("/:id", roomController.getRoomById);
 router.get("/master/:masterId", verifyToken, checkRole(["master"]), roomController.getRoomsByMasterId);

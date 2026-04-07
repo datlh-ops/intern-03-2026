@@ -82,6 +82,15 @@ class RoomController {
       res.status(err.message.includes("Không thể xóa") ? 404 : 500).json({ error: err.message });
     }
   }
+  async getTrendingRooms(req, res) {
+    try {
+      const { page, limit } = req.query;
+      const result = await roomService.getTrendingRooms(page, limit);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  }
 }
 
 module.exports = new RoomController();

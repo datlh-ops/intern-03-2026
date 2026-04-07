@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, IconButton, Tooltip } from '@mui/material';
+import { Avatar } from '@mui/material';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
 export default function PersonalInfoSection({ register, errors, user, avatarPreview, onAvatarChange, roleLabel = "Chủ trọ" }) {

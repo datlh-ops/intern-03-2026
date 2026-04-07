@@ -11,6 +11,7 @@ import RoomAttributes from './components/RoomAttributes';
 import RoomAmenities from './components/RoomAmenities';
 import RoomDescription from './components/RoomDescription';
 import RoomRecommendations from './components/RoomRecommendations';
+import RoomMap from './components/RoomMap';
 import ContractModal from '../../../components/Common/Contracts/ContractModal';
 
 export default function RoomDetailPage() {
@@ -110,6 +111,9 @@ export default function RoomDetailPage() {
 
           {/* 4. Detailed Amenities Grid */}
           <RoomAmenities amenities={room.amenities} />
+
+          {/* 4.5. Interactive Map Section */}
+          <RoomMap room={room} />
 
           {/* 5. Detailed Description Box */}
           <RoomDescription description={room.description} />

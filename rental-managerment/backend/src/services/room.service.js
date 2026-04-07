@@ -225,6 +225,33 @@ class RoomService {
 
     return { message: "Đã xóa triệt để phòng, hợp đồng liên quan và rác ảnh thành công!" };
   }
+
+  async getTrendingRooms(page, limit) {
+    const roomRepo = AppDataSource.getRepository("Room");
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 8;
+    const skip = (pageNum - 1) * limitNum;
+    const take = limitNum;
+
+    const [rooms, total] = await roomRepo.findAndCount({
+      where: { 
+        status: 0, // Chỉ lấy phòng trống
+        isTrending: true 
+      },
+      order: { id: "DESC" },
+      skip,
+      take,
+      relations: ["master"]
+    });
+
+    return {
+      rooms,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / take)
+    };
+  }
 }
 
 module.exports = new RoomService();

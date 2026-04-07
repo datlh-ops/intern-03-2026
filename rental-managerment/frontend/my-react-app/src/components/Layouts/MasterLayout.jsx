@@ -8,6 +8,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Footer from "../Navigation/Footer";
 
 export default function MasterLayout() {
   const navigate = useNavigate();
@@ -118,7 +119,12 @@ export default function MasterLayout() {
           </div>
         </header>
         <main className="pt-10 pl-8 pr-10 pb-10 flex-1 overflow-auto">
-          <Outlet />
+          <div className="min-h-full flex flex-col">
+            <div className="flex-1">
+              <Outlet />
+            </div>
+            <Footer />
+          </div>
         </main>
       </div>
     </div>

@@ -7,89 +7,6 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema as schema } from '../../schemas/auth.schema';
 
-import {
-  Box, Typography, Button,
-  Alert, Link, Divider, Stack, CssBaseline
-} from "@mui/material";
-import LabeledTextField from '../../components/Common/LabeledTextField';
-import LoadingButton from '../../components/Common/LoadingButton';
-
-const s = {
-  // Layout chính
-  container: {
-    display: 'flex',
-    height: '100vh',
-    overflow: 'hidden',
-  },
-
-  // Cột trái (nền xanh, có hình ảnh)
-  leftPanel: {
-    flex: 1,
-    backgroundImage: `linear-gradient(to right, rgba(25, 118, 210, 0.85), rgba(25, 118, 210, 0.5)), url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    display: { xs: 'none', sm: 'flex' },
-    flexDirection: 'column',
-    justifyContent: 'center',
-    color: 'white',
-    px: { sm: 4, md: 10 },
-  },
-
-  // Cột phải (nền tối)
-  rightPanel: {
-    flex: 1,
-    bgcolor: '#1a1a2e',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-
-  // Khung chứa form
-  formWrapper: {
-    maxWidth: 400,
-    width: '100%',
-    px: 4,
-  },
-
-  // Input Email / Password
-  textField: {
-    mb: 3,
-    '& .MuiFilledInput-root': {
-      bgcolor: 'rgba(255,255,255,0.08)',
-      color: '#fff',
-      '&:before, &:after': { display: 'none' },
-    },
-    '& .MuiInputBase-input::placeholder': {
-      color: 'rgba(255,255,255,0.4)',
-      opacity: 1,
-    },
-  },
-
-  // Divider "Or continue with"
-  divider: {
-    mb: 4,
-    '&::before, &::after': { borderColor: 'rgba(255,255,255,0.15)' },
-  },
-
-  // Nút Google
-  socialButton: {
-    textTransform: 'none',
-    color: '#fff',
-    borderColor: 'rgba(255,255,255,0.2)',
-  },
-
-  // Footer bám đáy
-  footer: {
-    position: 'absolute',
-    bottom: 32,
-    display: 'flex',
-    gap: 3,
-    opacity: 0.5,
-  },
-};
-
 export default function Login() {
   const [generalError, setGeneralError] = useState("");
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
@@ -116,7 +33,7 @@ export default function Login() {
     try {
       setGeneralError("");
       const credential = response.credential;
-      const resp = await loginWithGoogle(credential); // Mặc định là user
+      const resp = await loginWithGoogle(credential);
       await loginContext(resp);
       navigate("/");
     } catch (error) {
@@ -125,73 +42,72 @@ export default function Login() {
   };
 
   return (
-    <Box sx={s.container}>
-      <CssBaseline />
+    <div className="flex h-screen overflow-hidden font-sans">
+      {/* LEFT PANEL - Hidden on mobile */}
+      <div
+        className="hidden md:flex flex-1 flex-col justify-center px-12 lg:px-24 text-white relative bg-cover bg-center"
+        style={{ backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.4)), url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80')` }}
+      >
+        <div className="max-w-xl animate-in slide-in-from-left duration-1000">
+          <h1 className="text-5xl lg:text-7xl font-black italic tracking-tighter uppercase mb-6 leading-tight">
+            RENTAL <span className="text-emerald-500 decoration-8">HUB</span>
+          </h1>
+          <p className="text-lg text-slate-300 font-medium leading-relaxed max-w-md">
+            Hệ sinh thái thông minh kết nối chủ nhà và người thuê, mang lại sự minh bạch, an toàn và tiện lợi trong mọi giao dịch quản lý trọ.
+          </p>
+        </div>
+      </div>
 
-      {/* CỘT TRÁI */}
-      <Box sx={s.leftPanel}>
-        <Typography variant="h3" sx={{ fontFamily: '"Playfair Display", serif', fontWeight: '800', mb: 2, textShadow: '0 2px 10px rgba(0,0,0,0.3)', lineHeight: 1.2 }}>
-          Hệ Thống Quản Lý<br />Phòng Trọ
-        </Typography>
-        <Typography variant="h6" sx={{ opacity: 0.9, maxWidth: 450, lineHeight: 1.6, fontWeight: 400, textShadow: '0 1px 5px rgba(0,0,0,0.5)' }}>
-          Giải pháp hiện đại giúp chủ nhà vận hành trơn tru, và người thuê quản lý thông tin minh bạch, thuận tiện.
-        </Typography>
-      </Box>
+      {/* RIGHT PANEL - Login Form */}
+      <div className="flex-1 bg-slate-950 flex flex-col items-center justify-center relative p-8">
+        <div className="w-full max-w-[400px] animate-in zoom-in duration-700">
 
-      {/* CỘT PHẢI */}
-      <Box sx={s.rightPanel}>
-        <Box sx={s.formWrapper}>
-          <Typography variant="h4" sx={{ fontWeight: '700', mb: 1, color: '#fff' }}>
-            Xin Chào !!!
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 4, color: 'rgba(255,255,255,0.6)' }}>
-            Truy cập vào cổng quản lý của bạn
-          </Typography>
+          <div className="mb-10">
+            <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter mb-2">Xin Chào !!!</h2>
+            <p className="text-slate-400 font-bold text-xs uppercase tracking-widest opacity-60 italic">Quản lý thuê và cho thuê trọ trực tuyến</p>
+          </div>
 
-          {generalError && <Alert severity="error" sx={{ mb: 3 }}>{generalError}</Alert>}
+          {generalError && (
+            <div className="bg-rose-500/10 border border-rose-500 text-rose-500 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest mb-6">
+              {generalError}
+            </div>
+          )}
 
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <LabeledTextField
-              label="Tên đăng nhập"
-              darkMode
-              id="username"
-              placeholder="name@company.com"
-              autoComplete="username"
-              sx={s.textField}
-              {...register("username")}
-              error={!!errors.username}
-              helperText={errors.username?.message}
-            />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Tên đăng nhập</label>
+              <input
+                {...register("username")}
+                className={`w-full bg-slate-900 border ${errors.username ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-600`}
+                placeholder="name@company.com"
+              />
+              {errors.username && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.username.message}</p>}
+            </div>
 
-            <LabeledTextField
-              label="Mật khẩu"
-              darkMode
-              type="password"
-              id="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              sx={{ ...s.textField, mb: 1 }}
-              {...register("password")}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-            />
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-              <Link href="#" variant="caption" sx={{ color: '#1976d2', fontWeight: 'bold', textDecoration: 'none' }}>
-                Quên mật khẩu?
-              </Link>
-            </Box>
-            <LoadingButton
-              isSubmitting={isSubmitting}
-              label="Đăng nhập"
-              sx={{ mb: 4, bgcolor: '#1976d2' }}
-            />
-            <Divider sx={s.divider}>
-              <Typography variant="caption" sx={{ textTransform: 'uppercase', px: 1, color: 'rgba(255,255,255,0.4)' }}>
-                Hoặc tiếp tục với
-              </Typography>
-            </Divider>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Mật khẩu</label>
+              <input
+                {...register("password")}
+                type="password"
+                className={`w-full bg-slate-900 border ${errors.password ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-600`}
+                placeholder="••••••••"
+              />
+              {errors.password && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.password.message}</p>}
+            </div>
 
-            <Stack direction="row" spacing={2} sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+            <button
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-emerald-900/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              Đăng nhập ngay
+            </button>
+
+            <div className="flex items-center gap-4 my-8">
+              <div className="h-px bg-slate-800 flex-1"></div>
+              <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.3em]">Hoặc với</span>
+              <div className="h-px bg-slate-800 flex-1"></div>
+            </div>
+
+            <div className="flex justify-center">
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={() => setGeneralError('Lỗi kết nối tới Server của Google.')}
@@ -199,18 +115,27 @@ export default function Login() {
                 shape="rectangular"
                 width="100%"
               />
-            </Stack>
+            </div>
 
-            <Typography variant="body2" align="center" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-              Bạn chưa có tài khoản?{" "}
-              <Link component={RouterLink} to="/register" sx={{ color: '#1976d2', fontWeight: 'bold', textDecoration: 'none' }}>
-                Đăng Ký
-              </Link>
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
+            <div className="text-center text-slate-400 font-bold text-xs mt-10 flex flex-col gap-2">
+              <span>
+                Bạn chưa có tài khoản?{" "}
+                <RouterLink to="/register" className="text-emerald-500 hover:underline">Đăng ký ngay</RouterLink>
+              </span>
+              <RouterLink to="#" className="text-slate-600 hover:text-emerald-500 transition-colors">
+                Quên mật khẩu?
+              </RouterLink>
+            </div>
+          </form>
+        </div>
 
-    </Box>
+        {/* Footer info absolute */}
+        <div className="absolute bottom-8 flex gap-6 text-[9px] font-black text-slate-600 uppercase tracking-widest">
+          <span className="hover:text-slate-400 cursor-pointer transition-colors">Trợ giúp</span>
+          <span className="hover:text-slate-400 cursor-pointer transition-colors">Điều khoản</span>
+          <span className="hover:text-slate-400 cursor-pointer transition-colors">Bảo mật</span>
+        </div>
+      </div>
+    </div>
   );
 }

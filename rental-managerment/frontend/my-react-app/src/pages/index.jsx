@@ -13,3 +13,4 @@ export { default as Register } from "./Auth/Register";
 export { default as RoomFormPage } from "./Master/RoomForm";
 export { default as RoomDetailPage } from "./Tenant/RoomDetail";
 export { default as SharedContracts } from "./Common/Contracts";
+export { default as TenantDashboard } from "./Tenant/TenantDashboard";
