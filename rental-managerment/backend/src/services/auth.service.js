@@ -74,7 +74,6 @@ class AuthService {
     }
     const profileId = account.role === "master" ? account.masterId : account.userId;
 
-    // Tạo token payload
     const token = jwt.sign(
       {
         id: account.id,
@@ -87,9 +86,8 @@ class AuthService {
     return authDto.loginResponse(account, token);
   }
 
-  async googleLogin(credential, role) {
+  async googleLogin(credential) {
     const accountRepo = AppDataSource.getRepository("Account");
-    const masterRepo = AppDataSource.getRepository("Master");
     const userRepo = AppDataSource.getRepository("User");
 
     const ticket = await googleClient.verifyIdToken({
@@ -99,7 +97,7 @@ class AuthService {
     const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture } = payload;
 
-    // Tìm bằng googleId hoặc email. TypeORM query syntax $or is array of objects
+    // Tìm bằng googleId hoặc email. 
     let account = await accountRepo.findOne({
       where: [
         { googleId },
@@ -108,41 +106,23 @@ class AuthService {
       relations: ["user", "master"]
     });
 
-    const finalRole = role || "user";
-
     if (!account) {
-      let userId = null;
-      let masterId = null;
-
       const baseUsername = email.split("@")[0].replace(/[^a-zA-Z0-9]/g, "");
       const username = baseUsername + "_" + googleId.substring(0, 4);
 
-      if (finalRole === "master") {
-        const master = masterRepo.create({
-          name: name,
-          phone: "0000000000",
-          email: email,
-          address: "Chưa cập nhật",
-        });
-        const savedMaster = await masterRepo.save(master);
-        masterId = savedMaster.id;
-      } else {
-        const user = userRepo.create({
-          name: name,
-          phone: "0000000000",
-        });
-        const savedUser = await userRepo.save(user);
-        userId = savedUser.id;
-      }
+      const user = userRepo.create({
+        name: name,
+        phone: "0000000000",
+      });
+      const savedUser = await userRepo.save(user);
 
       const newAccount = accountRepo.create({
         username: username,
         googleId,
         email,
         avatar: picture,
-        role: finalRole,
-        userId,
-        masterId,
+        role: "user",
+        userId: savedUser.id,
       });
 
       account = await accountRepo.save(newAccount);
@@ -150,7 +130,7 @@ class AuthService {
       // Reload relations
       account = await accountRepo.findOne({
         where: { id: account.id },
-        relations: ["user", "master"]
+        relations: ["user"]
       });
     } else {
       if (!account.googleId) {
@@ -159,7 +139,6 @@ class AuthService {
         await accountRepo.save(account);
       }
     }
-
     const profileId = account.role === "master" ? account.masterId : account.userId;
     const token = jwt.sign(
       {
@@ -170,7 +149,6 @@ class AuthService {
       JWT_SECRET,
       { expiresIn: "1d" }
     );
-
     return authDto.loginResponse(account, token);
   }
 

@@ -17,7 +17,7 @@ const HeroSection = () => {
                     <span className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-400">Nền tảng thuê phòng trực tuyến</span>
                 </div>
                 <h1 className="text-7xl font-black mb-6 leading-[0.9] tracking-tighter uppercase italic animate-in slide-in-from-left duration-1000">
-                    TÌM <span className="text-emerald-400 underline decoration-8 underline-offset-8">PHÒNG TỐT</span> <br /> SỐNG TRỌN VẸN
+                    TÌM <span className="text-emerald-400 underline decoration-8 underline-offset-8">PHÒNG TỐT</span> <br /> GIÁ HỢP LÍ
                 </h1>
                 <p className="max-w-md text-slate-300 font-medium mb-10 leading-relaxed text-sm animate-in slide-in-from-left duration-1000">
                     Tìm kiếm phòng trọ với thông tin minh bạch, xác thực và các chương trình ưu đãi độc quyền chỉ dành cho thành viên RentalHub.
@@ -29,7 +29,6 @@ const HeroSection = () => {
                     >
                         Bắt đầu khám phá ngay
                     </button>
-
                 </div>
             </div>
         </section>

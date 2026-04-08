@@ -16,7 +16,7 @@ const TrendingSection = ({ rooms, page, totalPages, onPageChange }) => {
                         <span className="text-[9px] font-black uppercase tracking-[0.3em]">Hệ thống đề xuất</span>
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">
-                        PHÒNG <span className="text-emerald-600 underline decoration-4 underline-offset-4">SĂN ĐÓN</span> NHẤT
+                        PHÒNG MỚI
                     </h2>
                 </div>
             </div>
@@ -27,14 +27,14 @@ const TrendingSection = ({ rooms, page, totalPages, onPageChange }) => {
                     <div
                         key={room.id}
                         onClick={() => navigate(`/user/rooms/${room.id}`)}
-                        className="group cursor-pointer bg-white rounded-[24px] border border-slate-50 shadow-lg shadow-slate-200/20 overflow-hidden hover:-translate-y-1.5 transition-all duration-500"
+                        className="group cursor-pointer bg-white rounded border border-slate-50 shadow-lg shadow-slate-200/20 overflow-hidden hover:-translate-y-1.5 transition-all duration-500"
                     >
                         {/* Thu nhỏ h-48 thành h-40 */}
                         <div className="relative h-40 overflow-hidden">
-                            <img 
-                                src={room.thumbnail} 
-                                alt={room.title} 
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+                            <img
+                                src={room.thumbnail}
+                                alt={room.title}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                             />
                             <div className="absolute top-3 left-3 flex gap-1.5">
                                 <span className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg text-slate-900 font-black text-[8px] uppercase shadow-lg">
@@ -51,7 +51,7 @@ const TrendingSection = ({ rooms, page, totalPages, onPageChange }) => {
                                 <div className="space-y-0.5">
                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Giá thuê</p>
                                     <p className="text-lg font-black text-emerald-600 tracking-tighter">
-                                        {new Intl.NumberFormat('vi-VN').format(room.price)} 
+                                        {new Intl.NumberFormat('vi-VN').format(room.price)}
                                         <span className="text-[9px] text-slate-300 font-black ml-0.5 uppercase">/Tháng</span>
                                     </p>
                                 </div>
@@ -71,7 +71,7 @@ const TrendingSection = ({ rooms, page, totalPages, onPageChange }) => {
                     >
                         <ArrowBackIosIcon sx={{ fontSize: 14 }} />
                     </button>
-                    
+
                     <span className="text-[9px] font-black text-slate-900 uppercase tracking-[0.2em]">
                         Trang {page} / {totalPages}
                     </span>

@@ -20,8 +20,6 @@ export const AuthProvider = ({ children }) => {
         setErrorCtx("Hồ sơ tài khoản chưa được thiết lập. Vui lòng liên hệ Admin.");
         return;
       }
-
-      // 0-API F5 LOAD: Thiết lập Dữ liệu trực tiếp từ Bụng của Cookie (Fat Cookie)
       setUserProfile({
         ...storedUser
       });

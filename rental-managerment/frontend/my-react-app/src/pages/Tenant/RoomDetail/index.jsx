@@ -19,7 +19,6 @@ export default function RoomDetailPage() {
   const navigate = useNavigate();
   const [room, setRoom] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -37,7 +36,6 @@ export default function RoomDetailPage() {
     };
 
     const fetchRoomData = async () => {
-      setLoading(true);
       try {
         const res = await getRoomById(id);
         const roomData = res.data;
@@ -49,8 +47,6 @@ export default function RoomDetailPage() {
         console.error("Main fetch error:", err);
         toast.error("Không thể tải thông tin phòng");
         navigate('/user/rooms');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -67,15 +63,6 @@ export default function RoomDetailPage() {
     console.log("🔴 [RoomDetail] Closing Rental Modal");
     setIsModalOpen(false);
   };
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="text-center space-y-4">
-        <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Đang tải dữ liệu...</p>
-      </div>
-    </div>
-  );
 
   if (!room) return null;
 

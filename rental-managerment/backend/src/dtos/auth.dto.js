@@ -60,7 +60,7 @@ class AuthDTO {
     const userData = {
       ...profileData,
       accountId: account.id,
-      id: profileData.id || account.id, // Giữ id gốc của profile, fallback về account
+      id: profileData.id || account.id,
       username: account.username,
       role: account.role,
       profileId: profileId,

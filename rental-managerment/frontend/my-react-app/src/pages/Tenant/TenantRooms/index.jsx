@@ -76,7 +76,7 @@ export default function TenantRooms() {
       setTotalRooms(res.data.total || 0);
       setTotalPages(res.data.totalPages || 1);
       setCurrentPage(res.data.page || 1);
-
+      console.log(res.data.rooms);
       // Record this filter set as the "last applied" for this page
       if (page === 1) {
         setLastAppliedFilters({ search, city, district, sort });

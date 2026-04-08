@@ -5,7 +5,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   const { userProfile, isInitializing } = useAuth();
 
   if (isInitializing) {
-    return null; // Chờ API /auth/me kiểm tra Cookie xong
+    return null;
   }
 
   if (!userProfile) {
