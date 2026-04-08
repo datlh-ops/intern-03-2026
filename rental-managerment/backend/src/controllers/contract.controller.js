@@ -3,8 +3,8 @@ const contractService = require("../services/contract.service");
 class ContractController {
   async getContracts(req, res) {
     try {
-      const contracts = await contractService.getContracts(req.user);
-      console.log(`[GET] : get contract list for ${req.user.role}`);
+      const contracts = await contractService.getContracts(req.query, req.user);
+      console.log(`[GET] : get contract list (paginated) for ${req.user.role}`);
       res.json(contracts);
     } catch (err) {
       res.status(500).json({ error: err.message });

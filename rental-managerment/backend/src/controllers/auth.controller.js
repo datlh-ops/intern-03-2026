@@ -12,8 +12,21 @@ class AuthController {
 
   async login(req, res) {
     try {
+      console.log("\n\n╔══════════════════════════════════════════╗");
+      console.log("║         LOGIN REQUEST ĐẾN SERVER         ║");
+      console.log("╚══════════════════════════════════════════╝");
+      console.log("[REQUEST] Body:", req.body);
+      console.log("[REQUEST] Cookies hiện có:", req.cookies);
+      console.log("[REQUEST] User-Agent:", req.headers['user-agent']?.substring(0, 50));
+
       const { username, password } = req.body;
       const result = await authService.login(username, password);
+
+      console.log("\n[RESPONSE] Kết quả từ Service:", {
+        message: result.message,
+        hasToken: !!result.token,
+        user: result.user,
+      });
 
       // Set token to HttpOnly Cookie
       if (result.token) {
@@ -25,15 +38,19 @@ class AuthController {
         });
         const uiState = JSON.stringify(result.user);
 
-        res.cookie('ui_state', Buffer.from(uiState).toString('base64'), { // Mã hóa Base64 cho gọn
-          httpOnly: false, // Để React JS có thể đọc bằng document.cookie
+        console.log("[COOKIE] ui_state (JSON):", uiState);
+        console.log("[COOKIE] profileId gửi về:", result.user.profileId, result.user.profileId ? "✅" : "❌ NULL → Frontend sẽ chặn!");
+
+        res.cookie('ui_state', Buffer.from(uiState).toString('base64'), {
+          httpOnly: false,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
           maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        delete result.token; // Remove from JSON payload for security
+        delete result.token;
       }
+      console.log("══════════ LOGIN HOÀN TẤT ══════════\n");
 
       res.json(result);
     } catch (err) {
@@ -71,8 +88,9 @@ class AuthController {
 
       res.json(result);
     } catch (err) {
-      console.error(err);
-      res.status(401).json({ error: "Xác thực Google thất bại hoặc email không hợp lệ" });
+      console.error("[Google Auth Error] Chi tiết lỗi:", err.message);
+      if (err.stack) console.error(err.stack);
+      res.status(401).json({ error: "Xác thực Google thất bại hoặc email không hợp lệ", details: err.message });
     }
   }
 

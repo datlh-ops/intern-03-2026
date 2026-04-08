@@ -1,4 +1,5 @@
 const { AppDataSource } = require("../config/db");
+const { Not } = require("typeorm");
 const { cloudinary } = require("../config/cloudinary");
 
 class RoomService {
@@ -19,36 +20,37 @@ class RoomService {
       console.error("[Cloudinary Error] Lỗi dọn rác ảnh:", err.message);
     }
   }
-
-  // REFACTORED: Phân trang & Sắp xếp hoàn toàn dựa trên yêu cầu từ Frontend
   async getAllRooms(query) {
     const roomRepo = AppDataSource.getRepository("Room");
     const { page, limit, city, district, search, sort } = query;
 
-    // Ép kiểu đảm bảo tính toán chính xác
-    const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
     const skip = (pageNum - 1) * limitNum;
     const take = limitNum;
 
     const queryBuilder = roomRepo.createQueryBuilder("room")
       .leftJoinAndSelect("room.master", "master")
-      .where("room.status = :status", { status: 0 }); // Luôn chỉ lấy phòng trống (0)
+      .leftJoinAndSelect("room.users", "users");
 
-    // Lọc theo địa lý (Backend xử lý)
+    if (query.status !== undefined && query.status !== 'all') {
+      queryBuilder.where("room.status = :status", { status: parseInt(query.status) });
+    } else {
+      // Mặc định (hoặc khi chọn 'all'): Chỉ lấy phòng đang trống
+      queryBuilder.where("room.status = :status", { status: 0 });
+    }
+    
+    // Tuyệt đối không lấy phòng đã xóa mềm (status 4) cho User
+    queryBuilder.andWhere("room.status != 4");
     if (city && city !== 'Chọn Tỉnh/Thành') {
       queryBuilder.andWhere("room.city = :city", { city });
     }
     if (district && district !== 'Chọn Quận/Huyện') {
       queryBuilder.andWhere("room.district = :district", { district });
     }
-
-    // Tìm kiếm (Backend xử lý)
     if (search) {
       queryBuilder.andWhere("(room.roomNumber ILIKE :search OR room.title ILIKE :search OR room.location ILIKE :search)", { search: `%${search}%` });
     }
-
-    // SẮP XẾP (Backend xử lý theo yêu cầu từ Frontend)
     if (sort === 'price_asc') {
       queryBuilder.orderBy("room.price", "ASC");
     } else if (sort === 'price_desc') {
@@ -88,6 +90,9 @@ class RoomService {
 
     if (status !== 'all') {
       queryBuilder.andWhere("room.status = :status", { status: parseInt(status) });
+    } else {
+      // Luôn loại bỏ phòng đã xóa mềm (status 4) cho Master
+      queryBuilder.andWhere("room.status != :deletedStatus", { deletedStatus: 4 });
     }
 
     const [rooms, total] = await queryBuilder
@@ -96,13 +101,13 @@ class RoomService {
       .take(take)
       .getManyAndCount();
 
-    const masterWhere = { masterId: parseInt(masterId) };
+    const masterWhere = { masterId: parseInt(masterId), status: Not(4) };
     const [totalAll, occupied, vacant, pending, maintenance] = await Promise.all([
       roomRepo.count({ where: masterWhere }),
-      roomRepo.count({ where: { ...masterWhere, status: 1 } }),
-      roomRepo.count({ where: { ...masterWhere, status: 0 } }),
-      roomRepo.count({ where: { ...masterWhere, status: 2 } }),
-      roomRepo.count({ where: { ...masterWhere, status: 3 } }),
+      roomRepo.count({ where: { masterId: parseInt(masterId), status: 1 } }),
+      roomRepo.count({ where: { masterId: parseInt(masterId), status: 0 } }),
+      roomRepo.count({ where: { masterId: parseInt(masterId), status: 2 } }),
+      roomRepo.count({ where: { masterId: parseInt(masterId), status: 3 } }),
     ]);
 
     return {
@@ -216,14 +221,12 @@ class RoomService {
 
     const roomId = parseInt(id);
     const roomInfo = await roomRepo.findOne({ where: { id: roomId } });
-    if (!roomInfo) throw new Error("Không thể xóa. Phòng không tồn tại");
+    if (!roomInfo) throw new Error("Không tìm thấy phòng để xóa");
 
-    if (roomInfo.thumbnail) {
-      await this.deleteImageFromCloudinary(roomInfo.thumbnail);
-    }
-    await roomRepo.delete(roomId);
+    // SOFT DELETE: Cập nhật status thành 4 (Đã xóa) thay vì xóa bản ghi
+    await roomRepo.update(roomId, { status: 4 });
 
-    return { message: "Đã xóa triệt để phòng, hợp đồng liên quan và rác ảnh thành công!" };
+    return { message: "Đã chuyển trạng thái phòng sang 'Đã xóa' thành công!" };
   }
 
   async getTrendingRooms(page, limit) {
@@ -234,15 +237,50 @@ class RoomService {
     const take = limitNum;
 
     const [rooms, total] = await roomRepo.findAndCount({
-      where: { 
+      where: {
         status: 0, // Chỉ lấy phòng trống
-        isTrending: true 
+        isTrending: true
       },
       order: { id: "DESC" },
       skip,
       take,
       relations: ["master"]
     });
+
+    return {
+      rooms,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / take)
+    };
+  }
+  async getAllRoomsForAdmin(query) {
+    const roomRepo = AppDataSource.getRepository("Room");
+    const { page, limit, status, search } = query;
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    const skip = (pageNum - 1) * limitNum;
+    const take = limitNum;
+
+    const queryBuilder = roomRepo.createQueryBuilder("room")
+      .leftJoinAndSelect("room.master", "master")
+      .leftJoinAndSelect("room.users", "users");
+
+    if (status && status !== 'all') {
+      queryBuilder.where("room.status = :status", { status: parseInt(status) });
+    }
+    
+    if (search) {
+      queryBuilder.andWhere("(room.roomNumber ILIKE :search OR room.title ILIKE :search)", { search: `%${search}%` });
+    }
+
+    const [rooms, total] = await queryBuilder
+      .orderBy("room.id", "DESC")
+      .skip(skip)
+      .take(take)
+      .getManyAndCount();
 
     return {
       rooms,

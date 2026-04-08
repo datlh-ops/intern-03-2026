@@ -94,7 +94,7 @@ module.exports = class InitialSchema1711872000000 {
           { name: "role", type: "varchar", isNullable: false },
           { name: "status", type: "varchar", default: "'active'", isNullable: false },
           { name: "user_id", type: "int", isNullable: true, isUnique: true },
-          { name: "masterId", type: "int", isNullable: true, isUnique: true },
+          { name: "master_id", type: "int", isNullable: true, isUnique: true },
           { name: "created_at", type: "timestamp", default: "now()" },
           { name: "updated_at", type: "timestamp", default: "now()" },
         ],

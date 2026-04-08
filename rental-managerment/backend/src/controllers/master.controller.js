@@ -23,9 +23,9 @@ class MasterController {
 
   async getAllMasters(req, res) {
     try {
-      const masters = await masterService.getAllMasters();
-      this.logAction(req.method, "get master list");
-      res.json(masters);
+      const result = await masterService.getAllMasters(req.query);
+      this.logAction(req.method, "get master list (paginated)");
+      res.json(result);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

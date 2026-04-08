@@ -1,4 +1,5 @@
 const { AppDataSource } = require("../config/db");
+const { Not } = require("typeorm");
 const { cloudinary } = require("../config/cloudinary");
 
 class MasterService {
@@ -32,9 +33,39 @@ class MasterService {
     return master;
   }
 
-  async getAllMasters() {
+  async getAllMasters(query = {}) {
     const masterRepo = AppDataSource.getRepository("Master");
-    return await masterRepo.find();
+    const { page, limit } = query;
+    
+    if (!page || !limit) {
+      const masters = await masterRepo.find({ order: { id: "DESC" } });
+      return {
+        masters,
+        total: masters.length,
+        page: 1,
+        limit: masters.length || 10,
+        totalPages: 1
+      };
+    }
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    const skip = (pageNum - 1) * limitNum;
+    const take = limitNum;
+
+    const [masters, total] = await masterRepo.findAndCount({
+      order: { id: "DESC" },
+      skip,
+      take
+    });
+
+    return {
+      masters,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / take)
+    };
   }
 
   async updateMaster(id, data, file) {
@@ -71,7 +102,7 @@ class MasterService {
 
     // 1. Thống kê cơ bản thực tế
     const [totalRooms, vacantRooms, occupiedRooms, activeContracts] = await Promise.all([
-      roomRepo.count({ where: { masterId: id } }),
+      roomRepo.count({ where: { masterId: id, status: Not(4) } }),
       roomRepo.count({ where: { masterId: id, status: 0 } }),
       roomRepo.count({ where: { masterId: id, status: 1 } }),
       contractRepo.count({ where: { masterId: id, status: 1 } })

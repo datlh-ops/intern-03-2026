@@ -1,6 +1,7 @@
 import axios from "./axiosClient";
 
 export const getRooms = (params) => axios.get("/rooms", { params });
+export const getAdminRooms = (params) => axios.get("/rooms/admin/all", { params });
 export const getRoomById = (id) => axios.get(`/rooms/${id}`);
 export const getRandomRooms = (params) => axios.get("/rooms/random", { params });
 export const getTrendingRooms = (params) => axios.get("/rooms/trending", { params });

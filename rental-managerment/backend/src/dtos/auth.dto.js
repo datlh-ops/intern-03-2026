@@ -54,7 +54,10 @@ const changePasswordSchema = yup.object({
 
 class AuthDTO {
   static loginResponse(account, token) {
-    const profileId = account.role === "master" ? account.master?.id : account.user?.id;
+    // Fallback: Admin không có user/master profile → dùng account.id làm profileId dự phòng
+    const profileId = account.role === "master"
+      ? account.master?.id
+      : account.user?.id || (account.role === 'admin' ? account.id : null);
     const profileData = account.role === "master" ? (account.master || {}) : (account.user || {});
 
     const userData = {
@@ -65,6 +68,14 @@ class AuthDTO {
       role: account.role,
       profileId: profileId,
     };
+
+    console.log("[4] DTO → Cookie ui_state sẽ chứa:", {
+      profileId: userData.profileId,
+      role: userData.role,
+      username: userData.username,
+      id: userData.id,
+      "profileId có giá trị?": userData.profileId ? "✅ CÓ → Frontend sẽ cho vào" : "❌ KHÔNG → Frontend sẽ chặn",
+    });
 
     return {
       message: "Đăng nhập thành công",

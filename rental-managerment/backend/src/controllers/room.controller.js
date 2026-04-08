@@ -1,6 +1,15 @@
 const roomService = require("../services/room.service");
 
 class RoomController {
+  async getAllRoomsForAdmin(req, res) {
+    try {
+      const result = await roomService.getAllRoomsForAdmin(req.query);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message || "Server error" });
+    }
+  }
+
   async getAllRooms(req, res) {
     try {
       const result = await roomService.getAllRooms(req.query);
@@ -12,13 +21,9 @@ class RoomController {
 
   async getRoomsByMasterId(req, res) {
     try {
+      const { masterId } = req.params;
       const { page, limit, status } = req.query;
-      const result = await roomService.getRoomsByMasterId(
-        req.params.masterId,
-        page,
-        limit,
-        status
-      );
+      const result = await roomService.getRoomsByMasterId(masterId, page, limit, status);
       res.json(result);
     } catch (err) {
       res.status(500).json({ error: err.message });

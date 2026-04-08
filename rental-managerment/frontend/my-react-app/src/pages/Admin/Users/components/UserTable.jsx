@@ -1,57 +1,71 @@
+import PersonIcon from '@mui/icons-material/Person';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 export default function UserTable({ users, deleteUser, onEdit }) {
     return (
-        <div className="user-table" style={{ background: '#fff', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)', overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+        <div className="overflow-x-auto w-full">
+            <table className="w-full text-sm text-left whitespace-nowrap">
+                <thead className="bg-gray-50 border-b border-gray-100 text-gray-500 uppercase tracking-wider text-xs font-semibold">
                     <tr>
-                        <th style={{ padding: '16px', textAlign: 'left', color: '#64748b', fontWeight: '600', fontSize: '14px' }}>Tên</th>
-                        <th style={{ padding: '16px', textAlign: 'left', color: '#64748b', fontWeight: '600', fontSize: '14px' }}>SĐT</th>
-                        <th style={{ padding: '16px', textAlign: 'left', color: '#64748b', fontWeight: '600', fontSize: '14px' }}>Phòng</th>
-                        <th style={{ padding: '16px', textAlign: 'left', color: '#64748b', fontWeight: '600', fontSize: '14px' }}>Đại diện HĐ</th>
-                        <th style={{ padding: '16px', textAlign: 'left', color: '#64748b', fontWeight: '600', fontSize: '14px' }}>Hành động</th>
+                        <th className="px-6 py-4">Tên</th>
+                        <th className="px-6 py-4">SĐT</th>
+                        <th className="px-6 py-4">Phòng</th>
+                        <th className="px-6 py-4">Vai trò HĐ</th>
+                        <th className="px-6 py-4 text-right">Hành động</th>
                     </tr>
                 </thead>
 
-                <tbody>
+                <tbody className="divide-y divide-gray-100">
                     {users.map(user => (
-                        <tr key={user.id} style={{ borderBottom: '1px solid #f1f5f9', cursor: 'default' }}>
-                            <td style={{ padding: '16px', fontWeight: '500', color: '#0f172a' }}>{user.name}</td>
-                            <td style={{ padding: '16px', color: '#475569' }}>{user.phone}</td>
-
-                            {/* Trích xuất chuỗi tên Phòng từ dữ liệu Database đã Populate */}
-                            <td style={{ padding: '16px', color: '#3b82f6', fontWeight: '600' }}>
-                                {user.roomId ? user.roomId.roomNumber : "Chưa có phòng"}
+                        <tr key={user.id} className="hover:bg-blue-50/50 transition-colors">
+                            <td className="px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex flex-shrink-0 items-center justify-center">
+                                        <PersonIcon fontSize="small" />
+                                    </div>
+                                    <span className="font-medium text-gray-900">{user.name}</span>
+                                </div>
                             </td>
-
-                            <td style={{ padding: '16px' }}>
-                                {user.isRepresentative
-                                    ? <span style={{ padding: '4px 10px', background: '#dcfce3', color: '#166534', borderRadius: '999px', fontSize: '12px', fontWeight: '600' }}>⭐ Đại diện</span>
-                                    : <span style={{ padding: '4px 10px', background: '#f1f5f9', color: '#64748b', borderRadius: '999px', fontSize: '12px' }}>Bạn cùng phòng</span>
-                                }
+                            <td className="px-6 py-4 text-gray-600 font-medium">{user.phone}</td>
+                            <td className="px-6 py-4 text-blue-600 font-semibold">
+                                {user.roomId ? user.roomId.roomNumber : "Chưa xếp phòng"}
                             </td>
-
-                            <td style={{ padding: '16px' }}>
-                                <button
-                                    className="btn-edit"
-                                    onClick={() => onEdit(user)}
-                                    style={{ marginRight: '8px', backgroundColor: '#0ea5e9', color: '#fff', padding: '8px 14px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500', transition: 'all 0.2s' }}
-                                >
-                                    Sửa
-                                </button>
-                                <button
-                                    className="btn-delete"
-                                    onClick={() => deleteUser(user.id)}
-                                    style={{ backgroundColor: '#ef4444', color: '#fff', padding: '8px 14px', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '500', transition: 'all 0.2s' }}
-                                >
-                                    Xóa
-                                </button>
+                            <td className="px-6 py-4">
+                                {user.isRepresentative ? (
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                        Đại diện
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                                        Thành viên
+                                    </span>
+                                )}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                    <button
+                                        onClick={() => onEdit(user)}
+                                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Chỉnh sửa"
+                                    >
+                                        <EditIcon fontSize="small" />
+                                    </button>
+                                    <button
+                                        onClick={() => deleteUser(user.id)}
+                                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Xóa"
+                                    >
+                                        <DeleteIcon fontSize="small" />
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
                     {users.length === 0 && (
                         <tr>
-                            <td colSpan="5" style={{ padding: '32px', textAlign: 'center', color: '#94a3b8' }}>
-                                Chưa có khách thuê nào.
+                            <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                                <span className="block text-sm">Chưa có dữ liệu khách thuê.</span>
                             </td>
                         </tr>
                     )}

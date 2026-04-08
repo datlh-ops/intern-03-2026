@@ -40,9 +40,41 @@ class UserService {
     });
   }
 
-  async getAllUsers() {
+  async getAllUsers(query = {}) {
     const userRepo = AppDataSource.getRepository("User");
-    return await userRepo.find({ relations: ["room"] });
+    const { page, limit } = query;
+    
+    // Nếu không truyền page/limit thì trả về danh sách đầy đủ (tương thích backward) hoặc mặc định phân trang
+    if (!page || !limit) {
+       const users = await userRepo.find({ relations: ["room"], order: { id: "DESC" } });
+       return {
+         users,
+         total: users.length,
+         page: 1,
+         limit: users.length || 10,
+         totalPages: 1
+       };
+    }
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    const skip = (pageNum - 1) * limitNum;
+    const take = limitNum;
+
+    const [users, total] = await userRepo.findAndCount({
+      relations: ["room"],
+      order: { id: "DESC" },
+      skip,
+      take
+    });
+
+    return {
+      users,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / take)
+    };
   }
 
   async getUserById(id) {

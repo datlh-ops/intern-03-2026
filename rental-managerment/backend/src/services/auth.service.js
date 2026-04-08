@@ -68,11 +68,35 @@ class AuthService {
     if (!account) {
       throw new Error("Tài khoản không tồn tại");
     }
+
+    console.log("========== [LOGIN DEBUG] ==========");
+    console.log("[1] Account tìm thấy:", {
+      id: account.id,
+      username: account.username,
+      role: account.role,
+      userId: account.userId,
+      masterId: account.masterId,
+      "account.user": account.user ? `User(id=${account.user.id})` : null,
+      "account.master": account.master ? `Master(id=${account.master.id})` : null,
+    });
+
     const isMatch = await bcrypt.compare(password, account.password);
     if (!isMatch) {
       throw new Error("Mật khẩu không chính xác");
     }
-    const profileId = account.role === "master" ? account.masterId : account.userId;
+
+    // Fallback: Admin không có user/master profile → dùng account.id làm profileId dự phòng
+    const profileId = account.role === "master"
+      ? account.masterId
+      : account.userId || (account.role === 'admin' ? account.id : null);
+
+    console.log("[2] Tính profileId:", {
+      role: account.role,
+      "account.masterId": account.masterId,
+      "account.userId": account.userId,
+      "Kết quả profileId": profileId,
+      "Dùng fallback?": (!account.masterId && !account.userId && account.role === 'admin') ? "CÓ (dùng account.id)" : "KHÔNG",
+    });
 
     const token = jwt.sign(
       {
@@ -83,6 +107,9 @@ class AuthService {
       JWT_SECRET,
       { expiresIn: "1d" }
     );
+
+    console.log("[3] JWT Token payload:", { id: account.id, role: account.role, profileId });
+    console.log("====================================");
     return authDto.loginResponse(account, token);
   }
 
