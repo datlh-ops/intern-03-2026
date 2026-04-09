@@ -10,6 +10,8 @@ router.get("/", roomController.getAllRooms);
 
 // Các route cụ thể cấp 2 phải được đặt TRƯỚC các route có tham số động như :id
 router.get("/admin/all", verifyToken, checkRole(["admin"]), roomController.getAllRoomsForAdmin);
+router.get("/admin/export", verifyToken, checkRole(["admin"]), roomController.exportRoomsToExcel);
+
 router.get("/master/:masterId", verifyToken, checkRole(["master", "admin"]), roomController.getRoomsByMasterId);
 router.get("/trending", roomController.getTrendingRooms);
 router.get("/random", roomController.getRandomRooms);

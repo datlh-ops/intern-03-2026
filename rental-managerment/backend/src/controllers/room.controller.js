@@ -10,6 +10,15 @@ class RoomController {
     }
   }
 
+  async exportRoomsToExcel(req, res) {
+    try {
+      await roomService.exportRoomsToExcel(res, req.query);
+    } catch (err) {
+      res.status(500).json({ error: err.message || "Export error" });
+    }
+  }
+
+
   async getAllRooms(req, res) {
     try {
       const result = await roomService.getAllRooms(req.query);

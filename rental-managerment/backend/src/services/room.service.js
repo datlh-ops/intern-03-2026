@@ -39,7 +39,7 @@ class RoomService {
       // Mặc định (hoặc khi chọn 'all'): Chỉ lấy phòng đang trống
       queryBuilder.where("room.status = :status", { status: 0 });
     }
-    
+
     // Tuyệt đối không lấy phòng đã xóa mềm (status 4) cho User
     queryBuilder.andWhere("room.status != 4");
     if (city && city !== 'Chọn Tỉnh/Thành') {
@@ -257,7 +257,7 @@ class RoomService {
   }
   async getAllRoomsForAdmin(query) {
     const roomRepo = AppDataSource.getRepository("Room");
-    const { page, limit, status, search } = query;
+    const { page, limit, status, search, city, district } = query;
 
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 10;
@@ -269,12 +269,20 @@ class RoomService {
       .leftJoinAndSelect("room.users", "users");
 
     if (status && status !== 'all') {
-      queryBuilder.where("room.status = :status", { status: parseInt(status) });
+      queryBuilder.andWhere("room.status = :status", { status: parseInt(status) });
     }
-    
+
+    if (city && city !== 'Chọn Tỉnh/Thành') {
+      queryBuilder.andWhere("room.city = :city", { city });
+    }
+    if (district && district !== 'Chọn Quận/Huyện') {
+      queryBuilder.andWhere("room.district = :district", { district });
+    }
+
     if (search) {
       queryBuilder.andWhere("(room.roomNumber ILIKE :search OR room.title ILIKE :search)", { search: `%${search}%` });
     }
+
 
     const [rooms, total] = await queryBuilder
       .orderBy("room.id", "DESC")
@@ -290,6 +298,70 @@ class RoomService {
       totalPages: Math.ceil(total / take)
     };
   }
+
+  async exportRoomsToExcel(res, query) {
+
+    const roomRepo = AppDataSource.getRepository("Room");
+    const { status, search, city, district } = query;
+    const exportService = require("./export.service");
+
+    const queryBuilder = roomRepo.createQueryBuilder("room")
+      .leftJoinAndSelect("room.master", "master");
+
+    if (status && status !== 'all') {
+      queryBuilder.andWhere("room.status = :status", { status: parseInt(status) });
+    }
+    if (city && city !== 'Chọn Tỉnh/Thành') {
+      queryBuilder.andWhere("room.city = :city", { city });
+    }
+    if (district && district !== 'Chọn Quận/Huyện') {
+      queryBuilder.andWhere("room.district = :district", { district });
+    }
+    if (search) {
+      queryBuilder.andWhere("(room.roomNumber ILIKE :search OR room.title ILIKE :search)", { search: `%${search}%` });
+    }
+
+    const rooms = await queryBuilder.orderBy("room.id", "DESC").getMany();
+
+    const statusMap = {
+      0: "Trống",
+      1: "Đã thuê",
+      2: "Đang xử lý",
+      3: "Bảo trì",
+      4: "Đã xóa"
+    };
+
+    const data = rooms.map(r => ({
+      roomNumber: r.roomNumber,
+      title: r.title,
+      price: r.price.toLocaleString('vi-VN') + " đ",
+      area: r.area + " m2",
+      capacity: r.capacity + " người",
+      location: `${r.location}, ${r.ward}, ${r.district}, ${r.city}`,
+      status: statusMap[r.status] || "Không xác định",
+      master: r.master?.name || "N/A",
+      phone: r.master?.phone || "N/A"
+    }));
+
+    const headers = [
+      { label: "Số phòng", key: "roomNumber", width: 15 },
+      { label: "Tiêu đề", key: "title", width: 30 },
+      { label: "Giá thuê", key: "price", width: 15 },
+      { label: "Diện tích", key: "area", width: 15 },
+      { label: "Sức chứa", key: "capacity", width: 15 },
+      { label: "Địa chỉ", key: "location", width: 50 },
+      { label: "Trạng thái", key: "status", width: 15 },
+      { label: "Chủ trọ", key: "master", width: 20 },
+      { label: "SĐT Chủ trọ", key: "phone", width: 15 },
+    ];
+
+    return await exportService.exportToExcel(res, {
+      fileName: `Danh_sach_phong_tro_${new Date().getTime()}`,
+      headers,
+      data
+    });
+  }
 }
+
 
 module.exports = new RoomService();
