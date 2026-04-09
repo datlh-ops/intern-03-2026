@@ -379,10 +379,83 @@ class RoomService {
         reject(err);
       });
     });
-
   }
 
+  // PHƯƠNG PHÁP THEO LÔ (BATCHING - LIMIT/OFFSET)
+  async exportRoomsToExcelBatch(res, query) {
+    const roomRepo = AppDataSource.getRepository("Room");
+    const { status, search, city, district } = query;
+    const exportService = require("./export.service");
+
+    console.log("--- BẮT ĐẦU XUẤT FILE EXCEL (CÁCH THEO LÔ 10k) ---");
+    const startTime = Date.now();
+
+    const queryBuilder = roomRepo.createQueryBuilder("room")
+      .leftJoinAndSelect("room.master", "master");
+
+    if (status && status !== 'all') {
+      queryBuilder.andWhere("room.status = :status", { status: parseInt(status) });
+    }
+    if (city && city !== 'Chọn Tỉnh/Thành') {
+      queryBuilder.andWhere("room.city = :city", { city });
+    }
+    if (district && district !== 'Chọn Quận/Huyện') {
+      queryBuilder.andWhere("room.district = :district", { district });
+    }
+    if (search) {
+      queryBuilder.andWhere("(room.roomNumber ILIKE :search OR room.title ILIKE :search)", { search: `%${search}%` });
+    }
+
+    const total = await queryBuilder.getCount();
+    const batchSize = 10000;
+    let offset = 0;
+
+    const headers = [
+      { label: "Số phòng", key: "room_number", width: 15 },
+      { label: "Tiêu đề", key: "title", width: 30 },
+      { label: "Giá thuê", key: "price", width: 15 },
+      { label: "Diện tích", key: "area", width: 15 },
+      { label: "Sức chứa", key: "capacity", width: 15 },
+      { label: "Địa chỉ", key: "location", width: 50 },
+      { label: "Trạng thái", key: "status", width: 15 },
+      { label: "Chủ trọ", key: "master", width: 20 },
+      { label: "SĐT Chủ trọ", key: "phone", width: 15 },
+    ];
+    const statusMap = { 0: "Trống", 1: "Đã thuê", 2: "Đang xử lý", 3: "Bảo trì", 4: "Đã xóa" };
+
+    const { workbook, worksheet } = exportService.createStreamingWorkbook(res, `Batch_Export`, headers);
+
+    while (offset < total) {
+      console.log(`Đang xử lý lô: ${offset} -> ${offset + batchSize}`);
+      const rooms = await queryBuilder
+        .orderBy("room.id", "DESC")
+        .skip(offset)
+        .take(batchSize)
+        .getMany();
+
+      rooms.forEach(room => {
+        worksheet.addRow({
+          room_number: room.roomNumber || "N/A",
+          title: room.title || "N/A",
+          price: (room.price || 0).toLocaleString('vi-VN') + " đ",
+          area: (room.area || 0) + " m2",
+          capacity: (room.capacity || 0) + " người",
+          location: `${room.location || ''}, ${room.ward || ''}, ${room.district || ''}, ${room.city || ''}`,
+          status: statusMap[room.status] || "Không xác định",
+          master: room.master?.name || "N/A",
+          phone: room.master?.phone || "N/A"
+        }).commit();
+      });
+
+      offset += batchSize;
+    }
+
+    await workbook.commit();
+    console.log(`--- XUẤT THEO LÔ XONG. Tổng thời gian: ${Date.now() - startTime}ms ---`);
+  }
 }
+
+
 
 
 module.exports = new RoomService();

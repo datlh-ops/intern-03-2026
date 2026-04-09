@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import RoomTable from "./components/RoomTable";
 
-import { getAdminRooms, deleteRoomApi, exportAdminRoomsApi } from "../../../api/room.api";
+import { getAdminRooms, deleteRoomApi, exportAdminRoomsApi, exportAdminRoomsBatchApi } from "../../../api/room.api";
 import DeleteConfirmModal from "../../../components/Common/DeleteConfirmModal";
 import { Search, Filter, FileSpreadsheet, RefreshCcw } from "lucide-react";
 
@@ -23,6 +23,7 @@ export default function Rooms() {
 
 
     const [isExporting, setIsExporting] = useState(false);
+    const [isExportingBatch, setIsExportingBatch] = useState(false);
     const limit = 10;
 
 
@@ -104,28 +105,53 @@ export default function Rooms() {
         setPage(1);
         setActiveFilters(defaultFilters);
     };
-
-
     const handleExport = async () => {
+        const start = Date.now();
+        console.log("%c[STREAMING] Bắt đầu xuất file...", "color: #10b981; font-weight: bold;");
         try {
             setIsExporting(true);
             const response = await exportAdminRoomsApi(activeFilters);
-            // Download logic
+
+            const totalTime = Date.now() - start;
+            console.log(`%c[STREAMING] Hoàn thành! Tổng thời gian: ${totalTime}ms`, "color: #10b981; font-weight: bold;");
+
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `Rooms_Export_${new Date().toLocaleDateString()}.xlsx`);
+            link.setAttribute('download', `Streaming_Export_${new Date().getTime()}.xlsx`);
             document.body.appendChild(link);
             link.click();
             link.remove();
         } catch (error) {
-            console.error("Lỗi khi xuất file Excel:", error);
-            alert("Xuất file thất bại!");
+            console.error("[STREAMING] Lỗi:", error);
         } finally {
             setIsExporting(false);
         }
     };
 
+    const handleExportBatch = async () => {
+        const start = Date.now();
+        console.log("%c[BATCH] Bắt đầu xuất theo lô (10.000 dòng/lô)...", "color: #f59e0b; font-weight: bold;");
+        try {
+            setIsExportingBatch(true);
+            const response = await exportAdminRoomsBatchApi(activeFilters);
+
+            const totalTime = Date.now() - start;
+            console.log(`%c[BATCH] Hoàn thành! Tổng thời gian: ${totalTime}ms`, "color: #f59e0b; font-weight: bold;");
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Batch_Export_${new Date().getTime()}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error("[BATCH] Lỗi:", error);
+        } finally {
+            setIsExportingBatch(false);
+        }
+    };
 
     const handleDeleteClick = (id) => {
         setSelectedRoomId(id);
@@ -159,14 +185,25 @@ export default function Rooms() {
                         <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Quản lý Phòng trọ</h2>
                         <p className="text-sm text-gray-500 mt-1">Hệ thống toàn bộ phòng trọ đang hoạt động</p>
                     </div>
-                    <button
-                        onClick={handleExport}
-                        disabled={isExporting}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-900/20 disabled:opacity-50"
-                    >
-                        {isExporting ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
-                        Xuất Excel
-                    </button>
+                    <div className="flex gap-3">
+                        <button
+                            onClick={handleExportBatch}
+                            disabled={isExportingBatch || isExporting}
+                            className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-amber-900/20 disabled:opacity-50"
+                        >
+                            {isExportingBatch ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+                            Xuất batching
+                        </button>
+
+                        <button
+                            onClick={handleExport}
+                            disabled={isExporting || isExportingBatch}
+                            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-900/20 disabled:opacity-50"
+                        >
+                            {isExporting ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+                            Xuất Stream
+                        </button>
+                    </div>
                 </div>
 
                 {/* Section Bộ lọc */}
