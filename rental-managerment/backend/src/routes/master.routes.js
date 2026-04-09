@@ -8,10 +8,10 @@ const masterDto = require("../dtos/master.dto");
 
 router.post("/", verifyToken, checkRole(["master"]), validate(masterDto.profileSchema), masterController.createMaster.bind(masterController));
 router.post("/get", verifyToken, checkRole(["master"]), masterController.getMasterByIdBody.bind(masterController));
-router.get("/", verifyToken, checkRole(["master"]), masterController.getAllMasters.bind(masterController));
-router.get("/:id", verifyToken, checkRole(["master"]), masterController.getMasterById.bind(masterController));
-router.get("/:id/stats", verifyToken, checkRole(["master"]), masterController.getDashboardStats.bind(masterController));
-router.put("/:id", verifyToken, checkRole(["master"]), uploadCloud.single("image"), validate(masterDto.profileSchema), masterController.updateMaster.bind(masterController));
-router.delete("/:id", verifyToken, checkRole(["master"]), masterController.deleteMaster.bind(masterController));
+router.get("/", verifyToken, checkRole(["admin"]), masterController.getAllMasters.bind(masterController));
+router.get("/:id", verifyToken, checkRole(["master", "admin"]), masterController.getMasterById.bind(masterController));
+router.get("/:id/stats", verifyToken, checkRole(["master", "admin"]), masterController.getDashboardStats.bind(masterController));
+router.put("/:id", verifyToken, checkRole(["master", "admin"]), uploadCloud.single("image"), validate(masterDto.profileSchema), masterController.updateMaster.bind(masterController));
+router.delete("/:id", verifyToken, checkRole(["master", "admin"]), masterController.deleteMaster.bind(masterController));
 
 module.exports = router;

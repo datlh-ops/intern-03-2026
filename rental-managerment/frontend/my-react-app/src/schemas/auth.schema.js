@@ -20,11 +20,11 @@ export const loginSchema = yup.object({
 export const registerSchema = yup.object({
   username: yup.
     string().
-    required('Vui lòng nhập tên').
+    required('Vui lòng nhập tên đăng nhập').
     trim().
-    matches(/^\S+$/, 'Tên không được chứa khoảng trắng').
-    min(6, 'Tên ít nhất 6 ký tự').
-    max(200, 'Tên nhiều nhất 200 ký tự'),
+    matches(/^\S+$/, 'Tên đăng nhập không được chứa khoảng trắng').
+    min(6, 'Tên đăng nhập ít nhất 6 ký tự').
+    max(200, 'Tên đăng nhập nhiều nhất 200 ký tự'),
   password: yup.
     string().
     required('Vui lòng nhập mật khẩu').
@@ -32,5 +32,17 @@ export const registerSchema = yup.object({
     matches(/^\S+$/, 'Mật khẩu không được chứa khoảng trắng').
     min(6, 'Mật khẩu ít nhất 6 ký tự').
     max(200, 'Mật khẩu nhiều nhất 200 ký tự'),
+  confirmPassword: yup.
+    string().
+    required('Vui lòng xác nhận mật khẩu').
+    oneOf([yup.ref('password'), null], 'Mật khẩu xác nhận không khớp'),
+  name: yup.string().required('Họ và tên không được để trống').trim(),
+  email: yup.string().email('Email không hợp lệ').required('Email không được để trống').trim(),
+  phone: yup.
+    string().
+    required('Số điện thoại không được để trống').
+    matches(/^[0-9]+$/, 'Số điện thoại chỉ bao gồm số').
+    min(10, 'Số điện thoại ít nhất 10 số'),
   role: yup.string().required('Vui lòng chọn vai trò'),
 }).required();
+

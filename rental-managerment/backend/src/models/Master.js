@@ -49,11 +49,13 @@ module.exports = new EntitySchema({
     },
     createdAt: {
       type: "timestamp",
-      createDate: true
+      createDate: true,
+      name: "created_at"
     },
     updatedAt: {
       type: "timestamp",
-      updateDate: true
+      updateDate: true,
+      name: "updated_at"
     }
   },
   relations: {

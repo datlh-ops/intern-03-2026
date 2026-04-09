@@ -4,11 +4,12 @@ const userController = require("../controllers/user.controller");
 const { uploadCloud } = require("../config/cloudinary");
 const validate = require("../middleware/validation.middleware");
 const userDto = require("../dtos/user.dto");
+const { verifyToken, checkRole } = require("../middleware/auth.middleware");
 
 router.post("/", userController.createUser);
-router.get("/", userController.getAllUsers);
-router.get("/:id", userController.getUserById);
-router.put("/:id", uploadCloud.single("image"), validate(userDto.profileSchema), userController.updateUser);
-router.delete("/:id", userController.deleteUser);
+router.get("/", verifyToken, checkRole(["admin"]), userController.getAllUsers);
+router.get("/:id", verifyToken, userController.getUserById);
+router.put("/:id", verifyToken, uploadCloud.single("image"), validate(userDto.profileSchema), userController.updateUser);
+router.delete("/:id", verifyToken, checkRole(["admin"]), userController.deleteUser);
 
 module.exports = router;

@@ -1,6 +1,42 @@
 const roomService = require("../services/room.service");
 
 class RoomController {
+  async getAllRoomsForAdmin(req, res) {
+    try {
+      const result = await roomService.getAllRoomsForAdmin(req.query);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: err.message || "Server error" });
+    }
+  }
+
+  async exportRoomsToExcel(req, res) {
+    try {
+      await roomService.exportRoomsToExcel(res, req.query);
+    } catch (err) {
+      console.error("Export Controller Error:", err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: err.message || "Export error" });
+      } else {
+        // Nếu header đã gửi rồi (đang dở file), ta chỉ có thể kết thúc response
+        res.end();
+      }
+    }
+  }
+
+  async exportRoomsBatch(req, res) {
+    try {
+      await roomService.exportRoomsToExcelBatch(res, req.query);
+    } catch (err) {
+      console.error("Batch Export Error:", err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: err.message || "Export error" });
+      } else {
+        res.end();
+      }
+    }
+  }
+
   async getAllRooms(req, res) {
     try {
       const result = await roomService.getAllRooms(req.query);
@@ -12,13 +48,9 @@ class RoomController {
 
   async getRoomsByMasterId(req, res) {
     try {
+      const { masterId } = req.params;
       const { page, limit, status } = req.query;
-      const result = await roomService.getRoomsByMasterId(
-        req.params.masterId,
-        page,
-        limit,
-        status
-      );
+      const result = await roomService.getRoomsByMasterId(masterId, page, limit, status);
       res.json(result);
     } catch (err) {
       res.status(500).json({ error: err.message });

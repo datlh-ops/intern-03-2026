@@ -14,9 +14,9 @@ class UserController {
 
   async getAllUsers(req, res) {
     try {
-      const users = await userService.getAllUsers();
-      console.log(`[GET] : get user list`);
-      res.json(users);
+      const result = await userService.getAllUsers(req.query);
+      console.log(`[GET] : get user list (paginated)`);
+      res.json(result);
     } catch (err) {
       res.status(500).json({ error: "Server error" });
     }

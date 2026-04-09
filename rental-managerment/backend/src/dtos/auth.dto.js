@@ -32,6 +32,13 @@ const registerSchema = yup.object({
     .matches(/^\S+$/, "Mật khẩu không được chứa khoảng trắng")
     .min(6, "Mật khẩu ít nhất 6 ký tự")
     .max(200, "Mật khẩu nhiều nhất 200 ký tự"),
+  name: yup.string().required("Vui lòng nhập họ và tên").trim(),
+  email: yup.string().email("Email không hợp lệ").required("Vui lòng nhập email").trim(),
+  phone: yup
+    .string()
+    .required("Vui lòng nhập số điện thoại")
+    .matches(/^[0-9]+$/, "Số điện thoại chỉ bao gồm số")
+    .min(10, "Số điện thoại ít nhất 10 số"),
   role: yup
     .string()
     .oneOf(["admin", "master", "user"], "Vai trò không hợp lệ")
@@ -54,7 +61,10 @@ const changePasswordSchema = yup.object({
 
 class AuthDTO {
   static loginResponse(account, token) {
-    const profileId = account.role === "master" ? account.master?.id : account.user?.id;
+    // Fallback: Admin không có user/master profile → dùng account.id làm profileId dự phòng
+    const profileId = account.role === "master"
+      ? account.master?.id
+      : account.user?.id || (account.role === 'admin' ? account.id : null);
     const profileData = account.role === "master" ? (account.master || {}) : (account.user || {});
 
     const userData = {

@@ -10,11 +10,11 @@ connectDB();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use("/auth", require("./routes/auth.routes"));
-app.use("/users", verifyToken, require("./routes/user.routes"));
-app.use("/masters", verifyToken, require("./routes/master.routes"));
-app.use("/rooms", verifyToken, require("./routes/room.routes"));
-app.use("/contracts", verifyToken, require("./routes/contract.routes"));
+app.use("/api/auth", require("./routes/auth.routes"));
+app.use("/api/users", require("./routes/user.routes"));
+app.use("/api/masters", require("./routes/master.routes"));
+app.use("/api/rooms", require("./routes/room.routes"));
+app.use("/api/contracts", require("./routes/contract.routes"));
 
 app.get("/", (req, res) => {
   res.send("Server running and connected to PostgreSQL (TypeORM)");

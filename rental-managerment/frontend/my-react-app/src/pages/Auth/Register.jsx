@@ -13,14 +13,14 @@ export default function Register() {
     resolver: yupResolver(schema),
     mode: 'all',
     reValidateMode: 'onBlur',
-    defaultValues: { username: "", password: "", role: "user" },
+    defaultValues: { username: "", password: "", confirmPassword: "", role: "user", name: "", phone: "", email: "" },
   });
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
       setGeneralError("");
-      await registerUser(data.username, data.password, data.role);
+      await registerUser(data.username, data.password, data.role, data.name, data.phone, data.email);
       setSuccessOpen(true);
       setTimeout(() => navigate("/login"), 2500);
     } catch (error) {
@@ -98,15 +98,60 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Mật khẩu</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Họ và tên</label>
               <input 
-                {...register("password")}
-                type="password"
-                className={`w-full bg-slate-950 border ${errors.password ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-700`}
-                placeholder="••••••••••••"
+                {...register("name")}
+                className={`w-full bg-slate-950 border ${errors.name ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-700`}
+                placeholder="Ví dụ: Nguyễn Văn A"
               />
-              {errors.password && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.password.message}</p>}
+              {errors.name && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.name.message}</p>}
             </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Email</label>
+              <input 
+                {...register("email")}
+                className={`w-full bg-slate-950 border ${errors.email ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-700`}
+                placeholder="example@gmail.com"
+              />
+              {errors.email && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.email.message}</p>}
+            </div>
+
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Số điện thoại</label>
+              <input 
+                {...register("phone")}
+                className={`w-full bg-slate-950 border ${errors.phone ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-700`}
+                placeholder="09xxx..."
+              />
+              {errors.phone && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.phone.message}</p>}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Mật khẩu</label>
+                <input 
+                  {...register("password")}
+                  type="password"
+                  className={`w-full bg-slate-950 border ${errors.password ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-700`}
+                  placeholder="••••••••"
+                />
+                {errors.password && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.password.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Xác nhận</label>
+                <input 
+                  {...register("confirmPassword")}
+                  type="password"
+                  className={`w-full bg-slate-950 border ${errors.confirmPassword ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-700`}
+                  placeholder="••••••••"
+                />
+                {errors.confirmPassword && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.confirmPassword.message}</p>}
+              </div>
+            </div>
+
 
             <button 
               className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-emerald-900/20 transition-all active:scale-95 flex items-center justify-center gap-2 mt-4"

@@ -1,8 +1,9 @@
 const { AppDataSource } = require("../config/db");
 
 class ContractService {
-  async getContracts({ role, profileId }) {
+  async getContracts(queryReq, { role, profileId }) {
     const contractRepo = AppDataSource.getRepository("Contract");
+    const { page, limit } = queryReq;
     let query = {};
     if (role === "master") {
       query.masterId = parseInt(profileId);
@@ -10,16 +11,45 @@ class ContractService {
       query.userId = parseInt(profileId);
     }
 
-    return await contractRepo.find({
+    if (!page || !limit) {
+      const contracts = await contractRepo.find({
+        where: query,
+        relations: ["user", "room", "master"],
+        order: { id: "DESC" }
+      });
+      return {
+        contracts,
+        total: contracts.length,
+        page: 1, limit: contracts.length || 10, totalPages: 1
+      };
+    }
+
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    const skip = (pageNum - 1) * limitNum;
+    const take = limitNum;
+
+    const [contracts, total] = await contractRepo.findAndCount({
       where: query,
-      relations: ["user", "room", "master"]
+      relations: ["user", "room", "master"],
+      order: { id: "DESC" },
+      skip,
+      take
     });
+
+    return {
+      contracts,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil(total / take)
+    };
   }
 
   async createContract(data, { profileId }) {
     const contractRepo = AppDataSource.getRepository("Contract");
     const roomRepo = AppDataSource.getRepository("Room");
-    
+
     const roomId = parseInt(data.roomId);
     const room = await roomRepo.findOne({ where: { id: roomId } });
     if (!room) throw new Error("Phòng không tồn tại");
@@ -125,14 +155,15 @@ class ContractService {
       }
     }
 
-    // Nếu hợp đồng đang active (đã thuê) thì phải giải phóng phòng và người thuê khi xóa
-    if (contract.status === 1) { // 1: active
+    // Nếu hợp đồng đang active (đã thuê) hoặc đang chờ duyệt, thì phải giải phóng phòng và người thuê khi hủy
+    if (contract.status === 1 || contract.status === 0) {
       await roomRepo.update(contract.roomId, { status: 0 }); // 0: trống
       await userRepo.update(contract.userId, { roomId: null });
     }
 
-    await contractRepo.delete(contractId);
-    return { message: "Đã xóa hợp đồng thành công" };
+    await contractRepo.update(contractId, { status: 3 });
+
+    return { message: "Đã chuyển trạng thái hợp đồng sang 'Đã hủy' thành công" };
   }
 }
 

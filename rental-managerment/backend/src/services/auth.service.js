@@ -30,8 +30,8 @@ class AuthService {
 
     if (role === "master") {
       const master = masterRepo.create({
-        name: name || username,
-        phone: phone || null,
+        name: name,
+        phone: phone,
         email: email || null,
         address: address || null,
       });
@@ -39,8 +39,9 @@ class AuthService {
       masterId = savedMaster.id;
     } else if (role === "user") {
       const user = userRepo.create({
-        name: name || username,
-        phone: phone || "0000000000",
+        name: name,
+        phone: phone,
+        email: email,
       });
       const savedUser = await userRepo.save(user);
       userId = savedUser.id;
@@ -72,7 +73,10 @@ class AuthService {
     if (!isMatch) {
       throw new Error("Mật khẩu không chính xác");
     }
-    const profileId = account.role === "master" ? account.masterId : account.userId;
+    // Fallback: Admin không có user/master profile → dùng account.id làm profileId dự phòng
+    const profileId = account.role === "master"
+      ? account.masterId
+      : account.userId || (account.role === 'admin' ? account.id : null);
 
     const token = jwt.sign(
       {

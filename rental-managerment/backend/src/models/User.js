@@ -20,7 +20,8 @@ module.exports = new EntitySchema({
     isRepresentative: {
       type: "boolean",
       default: false,
-      nullable: false
+      nullable: false,
+      name: "is_representative"
     },
     status: {
       type: "smallint",
@@ -29,7 +30,8 @@ module.exports = new EntitySchema({
     },
     roomId: {
       type: "int",
-      nullable: true
+      nullable: true,
+      name: "room_id"
     },
     email: {
       type: "varchar",
@@ -45,18 +47,20 @@ module.exports = new EntitySchema({
     },
     createdAt: {
       type: "timestamp",
-      createDate: true
+      createDate: true,
+      name: "created_at"
     },
     updatedAt: {
       type: "timestamp",
-      updateDate: true
+      updateDate: true,
+      name: "updated_at"
     }
   },
   relations: {
     room: {
       target: "Room",
       type: "many-to-one",
-      joinColumn: { name: "roomId" },
+      joinColumn: { name: "room_id" },
       onDelete: "SET NULL",
       nullable: true
     },

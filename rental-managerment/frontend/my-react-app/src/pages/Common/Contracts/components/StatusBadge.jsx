@@ -10,6 +10,8 @@ const StatusBadge = ({ status }) => {
       case 2:
         return { label: 'Đã từ chối', className: 'bg-rose-50 text-rose-600 border-rose-100' };
       case 3:
+        return { label: 'Đã hủy', className: 'bg-red-50 text-red-600 border-red-100' };
+      case 4:
         return { label: 'Đã kết thúc', className: 'bg-slate-50 text-slate-500 border-slate-100' };
       default:
         return { label: 'Không xác định', className: 'bg-slate-50 text-slate-400 border-slate-100' };

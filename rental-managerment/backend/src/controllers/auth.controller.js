@@ -71,8 +71,9 @@ class AuthController {
 
       res.json(result);
     } catch (err) {
-      console.error(err);
-      res.status(401).json({ error: "Xác thực Google thất bại hoặc email không hợp lệ" });
+      console.error("[Google Auth Error] Chi tiết lỗi:", err.message);
+      if (err.stack) console.error(err.stack);
+      res.status(401).json({ error: "Xác thực Google thất bại hoặc email không hợp lệ", details: err.message });
     }
   }
 

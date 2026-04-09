@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import StatsGrid from "./components/StatsGrid";
 import RecentRooms from "./components/RecentRooms";
-import "./dashboard.css";
 import { getRooms } from "../../../api/room.api";
 import { getUsers } from "../../../api/user.api";
 import { getContracts } from "../../../api/contract.api";
@@ -16,15 +15,15 @@ export default function Dashboard() {
   const fetchData = useCallback(async () => {
     try {
       const [roomsRes, usersRes, contractsRes, mastersRes] = await Promise.all([
-        getRooms(),
+        getRooms({ limit: 1000, status: 'all' }),
         getUsers(),
         getContracts(),
         getMasters()
       ]);
-      setRooms(roomsRes.data);
-      setUsers(usersRes.data);
-      setContracts(contractsRes.data);
-      setMasters(mastersRes.data);
+      setRooms(roomsRes.data.rooms || roomsRes.data);
+      setUsers(usersRes.data.users || usersRes.data);
+      setContracts(contractsRes.data.contracts || contractsRes.data);
+      setMasters(mastersRes.data.masters || mastersRes.data);
     } catch (err) {
       console.error("Lỗi khi tải dữ liệu Dashboard:", err);
     }
@@ -36,20 +35,32 @@ export default function Dashboard() {
 
   const stats = useMemo(() => {
     return {
-      totalRooms: rooms.length,
-      rentedRooms: rooms.filter(r => r.status === "Đã thuê").length,
-      totalUsers: users.length,
-      activeContracts: contracts.filter(c => c.status === "active").length,
-      totalMasters: masters.length
+      totalRooms: Array.isArray(rooms) ? rooms.length : 0,
+      rentedRooms: Array.isArray(rooms) ? rooms.filter(r => r.status === "Đã thuê" || r.status === 1).length : 0,
+      totalUsers: Array.isArray(users) ? users.length : 0,
+      activeContracts: Array.isArray(contracts) ? contracts.filter(c => c.status === "active" || c.status === 1).length : 0,
+      totalMasters: Array.isArray(masters) ? masters.length : 0
     };
   }, [rooms, users, contracts, masters]);
 
   return (
-    <div className="dashboard">
-      <h2>Hệ thống Quản lý - Dashboard</h2>
+    <div className="p-6 md:p-8 bg-gray-50 min-h-screen space-y-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-8 shadow-lg">
+        <div className="relative z-10">
+          <h2 className="text-3xl font-extrabold text-white tracking-tight">Hệ thống Quản lý</h2>
+          <p className="mt-2 text-blue-100 max-w-2xl text-lg">Chào mừng quay trở lại, Admin! Dưới đây là tổng quan tình hình kinh doanh của hệ thống quản lý thuê phòng.</p>
+        </div>
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-10">
+          <div className="h-64 w-64 rounded-full bg-white blur-3xl"></div>
+        </div>
+      </div>
+      
       <StatsGrid stats={stats} />
-      <div className="dashboard-content">
-        <RecentRooms rooms={rooms} />
+      
+      <div className="grid grid-cols-1 gap-8 mt-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <RecentRooms rooms={rooms} />
+        </div>
       </div>
     </div>
   );

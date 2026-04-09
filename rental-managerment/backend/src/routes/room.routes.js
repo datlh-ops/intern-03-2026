@@ -7,10 +7,18 @@ const validate = require("../middleware/validation.middleware");
 const roomDto = require("../dtos/room.dto");
 
 router.get("/", roomController.getAllRooms);
+
+// Các route cụ thể cấp 2 phải được đặt TRƯỚC các route có tham số động như :id
+router.get("/admin/all", verifyToken, checkRole(["admin"]), roomController.getAllRoomsForAdmin);
+router.get("/admin/export", verifyToken, checkRole(["admin"]), roomController.exportRoomsToExcel);
+router.get("/admin/export-batch", verifyToken, checkRole(["admin"]), roomController.exportRoomsBatch);
+
+router.get("/master/:masterId", verifyToken, checkRole(["master", "admin"]), roomController.getRoomsByMasterId);
 router.get("/trending", roomController.getTrendingRooms);
 router.get("/random", roomController.getRandomRooms);
+
+// Route động này phải nằm dưới cùng của nhóm GET để không tranh chấp với các keyword như "admin", "master"
 router.get("/:id", roomController.getRoomById);
-router.get("/master/:masterId", verifyToken, checkRole(["master"]), roomController.getRoomsByMasterId);
 router.post("/", verifyToken, checkRole(["master"]), uploadCloud.single("image"), validate(roomDto.validateRoom), roomController.createRoom);
 router.put("/:id", verifyToken, checkRole(["master", "admin"]), uploadCloud.single("image"), validate(roomDto.validateRoom), roomController.updateRoom);
 router.delete("/:id", verifyToken, checkRole(["master", "admin"]), roomController.deleteRoom);
