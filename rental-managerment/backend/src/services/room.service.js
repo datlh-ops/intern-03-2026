@@ -300,7 +300,6 @@ class RoomService {
   }
 
   async exportRoomsToExcel(res, query) {
-
     const roomRepo = AppDataSource.getRepository("Room");
     const { status, search, city, district } = query;
     const exportService = require("./export.service");
@@ -321,30 +320,8 @@ class RoomService {
       queryBuilder.andWhere("(room.roomNumber ILIKE :search OR room.title ILIKE :search)", { search: `%${search}%` });
     }
 
-    const rooms = await queryBuilder.orderBy("room.id", "DESC").getMany();
-
-    const statusMap = {
-      0: "Trống",
-      1: "Đã thuê",
-      2: "Đang xử lý",
-      3: "Bảo trì",
-      4: "Đã xóa"
-    };
-
-    const data = rooms.map(r => ({
-      roomNumber: r.roomNumber,
-      title: r.title,
-      price: r.price.toLocaleString('vi-VN') + " đ",
-      area: r.area + " m2",
-      capacity: r.capacity + " người",
-      location: `${r.location}, ${r.ward}, ${r.district}, ${r.city}`,
-      status: statusMap[r.status] || "Không xác định",
-      master: r.master?.name || "N/A",
-      phone: r.master?.phone || "N/A"
-    }));
-
     const headers = [
-      { label: "Số phòng", key: "roomNumber", width: 15 },
+      { label: "Số phòng", key: "room_number", width: 15 },
       { label: "Tiêu đề", key: "title", width: 30 },
       { label: "Giá thuê", key: "price", width: 15 },
       { label: "Diện tích", key: "area", width: 15 },
@@ -355,12 +332,56 @@ class RoomService {
       { label: "SĐT Chủ trọ", key: "phone", width: 15 },
     ];
 
-    return await exportService.exportToExcel(res, {
-      fileName: `Danh_sach_phong_tro_${new Date().getTime()}`,
-      headers,
-      data
+    const statusMap = { 0: "Trống", 1: "Đã thuê", 2: "Đang xử lý", 3: "Bảo trì", 4: "Đã xóa" };
+
+    const { workbook, worksheet } = exportService.createStreamingWorkbook(
+      res,
+      `Danh_sach_phong_tro_${new Date().getTime()}`,
+      headers
+    );
+
+    console.log("--- BẮT ĐẦU XUẤT FILE EXCEL (STREAMING) ---");
+    const stream = await queryBuilder.orderBy("room.id", "DESC").stream();
+
+    return new Promise((resolve, reject) => {
+      let count = 0;
+      stream.on('data', (room) => {
+        try {
+          count++;
+          if (count === 1) console.log("Mẫu dữ liệu dòng đầu tiên:", room);
+
+          const mappedRoom = {
+            room_number: room.room_roomNumber || room.room_room_number || room.roomNumber || "N/A",
+            title: room.room_title || room.title || "N/A",
+            price: (room.room_price || 0).toLocaleString('vi-VN') + " đ",
+            area: (room.room_area || 0) + " m2",
+            capacity: (room.room_capacity || 0) + " người",
+            location: `${room.room_location || ''}, ${room.room_ward || ''}, ${room.room_district || ''}, ${room.room_city || ''}`,
+            status: statusMap[room.room_status] || "Không xác định",
+            master: room.master_name || "N/A",
+            phone: room.master_phone || "N/A"
+          };
+          worksheet.addRow(mappedRoom).commit();
+        } catch (err) {
+          console.error(`Lỗi tại dòng ${count}:`, err);
+        }
+      });
+
+
+      stream.on('end', async () => {
+        console.log(`--- HOÀN THÀNH: Đã xuất ${count} dòng ---`);
+        await workbook.commit();
+        resolve();
+      });
+
+      stream.on('error', (err) => {
+        console.error("LỖI STREAM DATABASE:", err);
+        reject(err);
+      });
     });
+
   }
+
 }
 
 

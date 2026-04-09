@@ -14,9 +14,16 @@ class RoomController {
     try {
       await roomService.exportRoomsToExcel(res, req.query);
     } catch (err) {
-      res.status(500).json({ error: err.message || "Export error" });
+      console.error("Export Controller Error:", err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: err.message || "Export error" });
+      } else {
+        // Nếu header đã gửi rồi (đang dở file), ta chỉ có thể kết thúc response
+        res.end();
+      }
     }
   }
+
 
 
   async getAllRooms(req, res) {

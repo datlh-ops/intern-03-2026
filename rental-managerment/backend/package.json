@@ -25,6 +25,7 @@
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
     "pg": "^8.20.0",
+    "pg-query-stream": "^4.14.0",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.28",
     "yup": "^1.7.1"

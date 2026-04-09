@@ -1,51 +1,37 @@
 const ExcelJS = require('exceljs');
 
 class ExportService {
-    async exportToExcel(res, { fileName, headers, data }) {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet(fileName);
+    createStreamingWorkbook(res, fileName, headers) {
 
-        // 1. Setup Headers
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}.xlsx`);
+
+        const options = {
+            stream: res, // Đẩy thẳng vào response
+            useStyles: true,
+            useSharedStrings: true
+        };
+
+        const workbook = new ExcelJS.stream.xlsx.WorkbookWriter(options);
+        const worksheet = workbook.addWorksheet('Data');
+
         worksheet.columns = headers.map(h => ({
             header: h.label,
             key: h.key,
             width: h.width || 20
         }));
 
-        // 2. Style Header
-        worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
-        worksheet.getRow(1).fill = {
+        // Style cho header
+        const headerRow = worksheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
+        headerRow.fill = {
             type: 'pattern',
             pattern: 'solid',
-            fgColor: { argb: '10b981' } // Màu emerald-600 (giống UI của bạn)
+            fgColor: { argb: '10b981' }
         };
-        worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' };
+        headerRow.commit(); // Quan trọng: xác nhận dòng để đẩy đi
 
-        // 3. Add Data
-        worksheet.addRows(data);
-
-        // 4. Style Rows
-        worksheet.eachRow((row, rowNumber) => {
-            row.alignment = { vertical: 'middle', horizontal: 'left' };
-            row.border = {
-                top: { style: 'thin' },
-                left: { style: 'thin' },
-                bottom: { style: 'thin' },
-                right: { style: 'thin' }
-            };
-        });
-
-        // 5. Send to response
-        res.setHeader(
-            'Content-Type',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        );
-        res.setHeader(
-            'Content-Disposition',
-            `attachment; filename=${fileName}.xlsx`
-        );
-
-        return await workbook.xlsx.write(res);
+        return { workbook, worksheet };
     }
 }
 
