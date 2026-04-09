@@ -7,14 +7,19 @@ export async function login(username, password) {
   });
   return response.data;
 }
-export async function register(username, password, role) {
+export async function register(username, password, role, name, phone, email) {
   const response = await axiosClient.post("/auth/register", {
     username,
     password,
-    role
+    role,
+    name,
+    phone,
+    email
   });
   return response.data;
 }
+
+
 
 export async function loginWithGoogle(credential, role = "user") {
   const response = await axiosClient.post("/auth/google", {

@@ -32,6 +32,13 @@ const registerSchema = yup.object({
     .matches(/^\S+$/, "Mật khẩu không được chứa khoảng trắng")
     .min(6, "Mật khẩu ít nhất 6 ký tự")
     .max(200, "Mật khẩu nhiều nhất 200 ký tự"),
+  name: yup.string().required("Vui lòng nhập họ và tên").trim(),
+  email: yup.string().email("Email không hợp lệ").required("Vui lòng nhập email").trim(),
+  phone: yup
+    .string()
+    .required("Vui lòng nhập số điện thoại")
+    .matches(/^[0-9]+$/, "Số điện thoại chỉ bao gồm số")
+    .min(10, "Số điện thoại ít nhất 10 số"),
   role: yup
     .string()
     .oneOf(["admin", "master", "user"], "Vai trò không hợp lệ")
@@ -68,14 +75,6 @@ class AuthDTO {
       role: account.role,
       profileId: profileId,
     };
-
-    console.log("[4] DTO → Cookie ui_state sẽ chứa:", {
-      profileId: userData.profileId,
-      role: userData.role,
-      username: userData.username,
-      id: userData.id,
-      "profileId có giá trị?": userData.profileId ? "✅ CÓ → Frontend sẽ cho vào" : "❌ KHÔNG → Frontend sẽ chặn",
-    });
 
     return {
       message: "Đăng nhập thành công",

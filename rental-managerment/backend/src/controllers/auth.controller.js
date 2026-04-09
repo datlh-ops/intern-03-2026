@@ -12,21 +12,8 @@ class AuthController {
 
   async login(req, res) {
     try {
-      console.log("\n\n╔══════════════════════════════════════════╗");
-      console.log("║         LOGIN REQUEST ĐẾN SERVER         ║");
-      console.log("╚══════════════════════════════════════════╝");
-      console.log("[REQUEST] Body:", req.body);
-      console.log("[REQUEST] Cookies hiện có:", req.cookies);
-      console.log("[REQUEST] User-Agent:", req.headers['user-agent']?.substring(0, 50));
-
       const { username, password } = req.body;
       const result = await authService.login(username, password);
-
-      console.log("\n[RESPONSE] Kết quả từ Service:", {
-        message: result.message,
-        hasToken: !!result.token,
-        user: result.user,
-      });
 
       // Set token to HttpOnly Cookie
       if (result.token) {
@@ -38,19 +25,15 @@ class AuthController {
         });
         const uiState = JSON.stringify(result.user);
 
-        console.log("[COOKIE] ui_state (JSON):", uiState);
-        console.log("[COOKIE] profileId gửi về:", result.user.profileId, result.user.profileId ? "✅" : "❌ NULL → Frontend sẽ chặn!");
-
-        res.cookie('ui_state', Buffer.from(uiState).toString('base64'), {
-          httpOnly: false,
+        res.cookie('ui_state', Buffer.from(uiState).toString('base64'), { // Mã hóa Base64 cho gọn
+          httpOnly: false, // Để React JS có thể đọc bằng document.cookie
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
           maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        delete result.token;
+        delete result.token; // Remove from JSON payload for security
       }
-      console.log("══════════ LOGIN HOÀN TẤT ══════════\n");
 
       res.json(result);
     } catch (err) {
