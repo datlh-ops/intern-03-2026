@@ -43,8 +43,8 @@ const importRowSchema = yup.object({
   tenantEmail: yup.string().transform(nullTransform).nullable().matches(emailRegExp, "Email người thuê không hợp lệ"),
   deposit: yup.number().typeError("Tiền cọc phải là số").transform((value, originalValue) => (originalValue === "" ? 0 : value)).nullable().default(0).max(15000000, "Tiền cọc của phòng trọ không được vượt quá 15 triệu"),
   startDate: yup.date().typeError("Ngày bắt đầu không đúng định dạng").transform(nullTransform).nullable(),
-  endDate: yup.matches('^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$', "Định dạng ngày phải đúng").typeError("Ngày kết thúc không đúng định dạng").transform(nullTransform).nullable(),
-  excelRow: yup.number().matches("^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$", "định dạng phải đúng").nullable(), // Giữ lại số dòng để báo lỗi
+  endDate: yup.date().typeError("Ngày kết thúc không đúng định dạng").transform(nullTransform).nullable(),
+  excelRow: yup.number().required("Số dòng Excel là bắt buộc").integer(),
 });
 
 const importSchema = yup.object({
