@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "react-hot-toast";
+import { importRowSchema } from "../../../schemas/import.schema";
 
 // Components
 import RoomTable from "./components/RoomTable";
@@ -37,7 +38,6 @@ export default function Rooms() {
     const [districts, setDistricts] = useState([]);
 
     const [isExporting, setIsExporting] = useState(false);
-    const [isExportingBatch, setIsExportingBatch] = useState(false);
     const [activeJobId, setActiveJobId] = useState(null);
     const [importResult, setImportResult] = useState({
         isOpen: false,
@@ -149,29 +149,6 @@ export default function Rooms() {
         }
     };
 
-    const handleExportBatch = async () => {
-        const start = Date.now();
-        console.log("%c[BATCH] Bắt đầu xuất theo lô (10.000 dòng/lô)...", "color: #f59e0b; font-weight: bold;");
-        try {
-            setIsExportingBatch(true);
-            const response = await exportAdminRoomsBatchApi(activeFilters);
-
-            const totalTime = Date.now() - start;
-            console.log(`%c[BATCH] Hoàn thành! Tổng thời gian: ${totalTime}ms`, "color: #f59e0b; font-weight: bold;");
-
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `Batch_Export_${new Date().getTime()}.xlsx`);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        } catch (error) {
-            console.error("[BATCH] Lỗi:", error);
-        } finally {
-            setIsExportingBatch(false);
-        }
-    };
 
     const handleExportCloudinary = async () => {
         try {
@@ -208,13 +185,22 @@ export default function Rooms() {
                 // Hàm xử lý ngày tháng từ Excel
                 const formatExcelDate = (val) => {
                     if (!val) return null;
-                    if (val instanceof Date) return val;
-                    // Nếu là chuỗi dạng DD/MM/YYYY
-                    if (typeof val === 'string' && val.includes('/')) {
+
+                    let date;
+                    if (val instanceof Date) {
+                        date = val;
+                    } else if (typeof val === 'number') {
+                        date = new Date(Math.round((val - 25569) * 86400 * 1000));
+                    } else if (typeof val === 'string' && val.includes('/')) {
                         const [d, m, y] = val.split('/');
-                        return new Date(y, m - 1, d);
+                        return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+                    } else {
+                        return val;
                     }
-                    return val;
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${day}/${month}/${year}`;
                 };
 
                 const rows = json.slice(1)
@@ -243,6 +229,7 @@ export default function Rooms() {
                             description: r[13]?.toString().trim(),
                             amenities: r[14]?.toString().trim(),
                             isTrending: r[15]?.toString().toLowerCase() === "true" || r[15] === "1" || r[15]?.toString().toLowerCase() === "có",
+                            status: r[16]?.toString().trim() || "Trống",
                             tenantName: r[17]?.toString().trim() || null,
                             tenantPhone: r[18]?.toString().trim() || null,
                             deposit: parseFloat(r[19]) || 0,
@@ -260,6 +247,28 @@ export default function Rooms() {
                     toast.error("Chỉ được nhập tối đa 100 dòng mỗi lần!");
                     return;
                 }
+
+                // --- VALIDATE FRONTEND ---
+                const validationErrors = [];
+                for (const row of rows) {
+                    try {
+                        await importRowSchema.validate(row, { abortEarly: false });
+                    } catch (err) {
+                        err.inner.forEach(e => {
+                            validationErrors.push(`Dòng ${row.excelRow}: ${e.message}`);
+                        });
+                    }
+                }
+
+                if (validationErrors.length > 0) {
+                    setImportResult({
+                        isOpen: true,
+                        errors: validationErrors.slice(0, 50), // Hiển thị giới hạn 50 lỗi đầu tiên
+                        successMessage: ''
+                    });
+                    return;
+                }
+                // -------------------------
 
                 const res = await importAdminRoomsApi(rows);
                 setImportResult({
@@ -304,12 +313,10 @@ export default function Rooms() {
             <div className="max-w-7xl mx-auto space-y-6">
 
                 <RoomHeader
-                    handleExportBatch={handleExportBatch}
                     handleExport={handleExport}
                     handleExportCloudinary={handleExportCloudinary}
                     handleImportExcel={handleImportExcel}
                     isExporting={isExporting}
-                    isExportingBatch={isExportingBatch}
                     activeJobId={activeJobId}
                     fileInputRef={fileInputRef}
                 />

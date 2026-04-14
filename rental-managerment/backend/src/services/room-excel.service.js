@@ -115,101 +115,7 @@ class RoomExcelService {
     });
   }
 
-  /**
-   * Xuất danh sách phòng theo lô (Batching)
-   */
-  async exportRoomsToExcelBatch(res, query) {
-    const roomRepo = AppDataSource.getRepository("Room");
-    const { status, search, city, district } = query;
 
-    const queryBuilder = roomRepo.createQueryBuilder("room")
-      .leftJoinAndSelect("room.master", "master")
-      .leftJoinAndSelect("room.contracts", "contracts", "contracts.status = :activeStatus", { activeStatus: 1 })
-      .leftJoinAndSelect("contracts.user", "tenant");
-
-    if (status && status !== 'all') {
-      queryBuilder.andWhere("room.status = :status", { status: parseInt(status) });
-    }
-    if (city && city !== 'Chọn Tỉnh/Thành') {
-      queryBuilder.andWhere("room.city = :city", { city });
-    }
-    if (district && district !== 'Chọn Quận/Huyện') {
-      queryBuilder.andWhere("room.district = :district", { district });
-    }
-    if (search) {
-      queryBuilder.andWhere("(room.roomNumber ILIKE :search OR room.title ILIKE :search)", { search: `%${search}%` });
-    }
-
-    const total = await queryBuilder.getCount();
-    const batchSize = 10000;
-    let offset = 0;
-
-    const headers = [
-      { label: "Họ tên Chủ trọ", key: "master_name", width: 20 },
-      { label: "SĐT Chủ trọ", key: "master_phone", width: 15 },
-      { label: "Email Chủ trọ", key: "master_email", width: 25 },
-      { label: "Địa chỉ Chủ trọ", key: "master_address", width: 30 },
-      { label: "Số phòng", key: "room_number", width: 15 },
-      { label: "Tiêu đề", key: "title", width: 30 },
-      { label: "Giá thuê", key: "price", width: 15 },
-      { label: "Diện tích", key: "area", width: 15 },
-      { label: "Sức chứa", key: "capacity", width: 15 },
-      { label: "Tỉnh/Thành", key: "city", width: 20 },
-      { label: "Quận/Huyện", key: "district", width: 20 },
-      { label: "Phường/Xã", key: "ward", width: 20 },
-      { label: "Địa chỉ chi tiết", key: "location", width: 50 },
-      { label: "Mô tả", key: "description", width: 40 },
-      { label: "Tiện ích", key: "amenities", width: 30 },
-      { label: "Nổi bật", key: "is_trending", width: 10 },
-      { label: "Trạng thái", key: "status", width: 15 },
-      { label: "Họ tên người thuê", key: "tenant_name", width: 20 },
-      { label: "SĐT người thuê", key: "tenant_phone", width: 15 },
-      { label: "Tiền cọc", key: "deposit", width: 15 },
-      { label: "Ngày bắt đầu", key: "start_date", width: 15 },
-      { label: "Ngày kết thúc", key: "end_date", width: 15 },
-    ];
-    const statusMap = { 0: "Trống", 1: "Đã thuê", 2: "Đang xử lý", 3: "Bảo trì", 4: "Đã xóa" };
-
-    const { workbook, worksheet } = exportService.createStreamingWorkbook(res, `Batch_Export`, headers);
-
-    while (offset < total) {
-      const rooms = await queryBuilder
-        .orderBy("room.id", "DESC")
-        .skip(offset)
-        .take(batchSize)
-        .getMany();
-
-      rooms.forEach(room => {
-        worksheet.addRow({
-          master_name: room.master?.name || "N/A",
-          master_phone: room.master?.phone || "N/A",
-          master_email: room.master?.email || "N/A",
-          master_address: room.master?.address || "N/A",
-          room_number: room.roomNumber || "N/A",
-          title: room.title || "N/A",
-          price: room.price || 0,
-          area: room.area || 0,
-          capacity: room.capacity || 0,
-          city: room.city || "N/A",
-          district: room.district || "N/A",
-          ward: room.ward || "N/A",
-          location: room.location || "N/A",
-          description: room.description || "N/A",
-          amenities: Array.isArray(room.amenities) ? room.amenities.join(", ") :
-            (typeof room.amenities === 'string' ? room.amenities : ""),
-          is_trending: room.isTrending ? "Có" : "Không",
-          status: statusMap[room.status] || "Không xác định",
-          tenant_name: room.contracts?.[0]?.user?.name || "không",
-          tenant_phone: room.contracts?.[0]?.user?.phone || "không",
-          deposit: room.contracts?.[0]?.deposit || 0,
-          start_date: room.contracts?.[0]?.startDate ? new Date(room.contracts[0].startDate).toLocaleDateString("vi-VN") : "",
-          end_date: room.contracts?.[0]?.endDate ? new Date(room.contracts[0].endDate).toLocaleDateString("vi-VN") : "",
-        }).commit();
-      });
-      offset += batchSize;
-    }
-    await workbook.commit();
-  }
 
   /**
    * Xuất danh sách phòng lên Cloudinary (Chạy ngầm)
@@ -443,7 +349,12 @@ class RoomExcelService {
         }
 
         // 3. Xử lý Room
-        const roomStatus = tenant ? 1 : 0;
+        // Xác định trạng thái phòng: Ưu tiên theo khách thuê hoặc giá trị status từ Excel
+        const RENTED_KEYWORDS = ['đã thuê', 'rented', '1'];
+        const excelStatus = item.status?.toString().toLowerCase();
+
+        // Mặc định là 0 (AVAILABLE), nếu thuộc nhóm Rented thì set bằng 1 (RENTED)
+        const roomStatus = (tenant || RENTED_KEYWORDS.includes(excelStatus)) ? 1 : 0;
         const room = await queryRunner.manager.save("Room", {
           roomNumber: item.roomNumber,
           title: item.title,

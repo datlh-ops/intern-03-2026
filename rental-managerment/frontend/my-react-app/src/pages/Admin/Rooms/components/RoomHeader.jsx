@@ -1,12 +1,10 @@
 import { FileSpreadsheet, RefreshCcw, Cloud, Upload } from "lucide-react";
 
 export default function RoomHeader({ 
-    handleExportBatch, 
     handleExport, 
     handleExportCloudinary, 
     handleImportExcel, 
     isExporting, 
-    isExportingBatch, 
     activeJobId, 
     fileInputRef 
 }) {
@@ -18,17 +16,8 @@ export default function RoomHeader({
             </div>
             <div className="flex gap-3">
                 <button
-                    onClick={handleExportBatch}
-                    disabled={isExportingBatch || isExporting}
-                    className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-amber-900/20 disabled:opacity-50"
-                >
-                    {isExportingBatch ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
-                    Xuất batching
-                </button>
-
-                <button
                     onClick={handleExport}
-                    disabled={isExporting || isExportingBatch}
+                    disabled={isExporting}
                     className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-900/20 disabled:opacity-50"
                 >
                     {isExporting ? <RefreshCcw className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}

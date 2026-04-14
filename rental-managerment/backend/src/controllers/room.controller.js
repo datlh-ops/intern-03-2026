@@ -24,18 +24,7 @@ class RoomController {
     }
   }
 
-  async exportRoomsBatch(req, res) {
-    try {
-      await roomExcelService.exportRoomsToExcelBatch(res, req.query);
-    } catch (err) {
-      console.error("Batch Export Error:", err);
-      if (!res.headersSent) {
-        res.status(500).json({ error: err.message || "Export error" });
-      } else {
-        res.end();
-      }
-    }
-  }
+
 
   async getAllRooms(req, res) {
     try {

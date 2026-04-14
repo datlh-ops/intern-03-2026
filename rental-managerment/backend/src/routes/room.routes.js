@@ -17,7 +17,7 @@ router.get("/", roomController.getAllRooms);
 // Các route cụ thể cấp 2 phải được đặt TRƯỚC các route có tham số động như :id
 router.get("/admin/all", verifyToken, checkRole(["admin"]), roomController.getAllRoomsForAdmin);
 router.get("/admin/export", verifyToken, checkRole(["admin"]), roomController.exportRoomsToExcel);
-router.get("/admin/export-batch", verifyToken, checkRole(["admin"]), roomController.exportRoomsBatch);
+
 router.post("/admin/export-cloudinary", verifyToken, checkRole(["admin"]), roomController.exportRoomsToCloudinary);
 router.get("/admin/export-status/:jobId", verifyToken, checkRole(["admin"]), roomController.getExportStatus);
 router.post("/admin/import", verifyToken, checkRole(["admin"]), validate(importDto.validateImport), roomController.importRooms);
