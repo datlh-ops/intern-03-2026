@@ -18,9 +18,6 @@ router.get("/", roomController.getAllRooms);
 router.get("/admin/all", verifyToken, checkRole(["admin"]), roomController.getAllRoomsForAdmin);
 router.get("/admin/export", verifyToken, checkRole(["admin"]), roomController.exportRoomsToExcel);
 
-router.post("/admin/export-cloudinary", verifyToken, checkRole(["admin"]), roomController.exportRoomsToCloudinary);
-router.get("/admin/export-status/:jobId", verifyToken, checkRole(["admin"]), roomController.getExportStatus);
-router.get("/admin/download-sample", verifyToken, checkRole(["admin"]), roomController.downloadSample);
 router.post("/admin/import", verifyToken, checkRole(["admin"]), validate(importDto.validateImport), roomController.importRooms);
 
 router.get("/master/:masterId", verifyToken, checkRole(["master", "admin"]), roomController.getRoomsByMasterId);

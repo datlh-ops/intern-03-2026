@@ -1,34 +1,21 @@
-import React, { useRef } from 'react';
-import { X, Upload, Download, FileText, AlertCircle } from 'lucide-react';
-import { downloadTemplateApi } from '../../../../api/room.api';
+import React, { useRef, useState } from 'react';
+import { X, Upload, Download, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { generateRoomImportTemplate } from '../../../../utils/room-excel-template';
 
 export default function ImportRoomModal({ isOpen, onClose, onImport, isImporting }) {
     const fileInputRef = useRef(null);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     if (!isOpen) return null;
 
     const handleDownloadTemplate = async () => {
         try {
-            const response = await downloadTemplateApi();
-            
-            // Nếu trả về URL từ Cloudinary
-            if (response.data?.url) {
-                window.open(response.data.url, '_blank');
-                return;
-            }
-
-            // Phương án dự phòng (Fallback) nếu trả về file nhị phân trực tiếp
-            const blob = response.data instanceof Blob ? response.data : new Blob([response.data]);
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'Mau_Import_Phong.xlsx');
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
+            setIsGenerating(true);
+            await generateRoomImportTemplate();
         } catch (error) {
-            console.error("Lỗi tải file mẫu:", error);
+            console.error("Lỗi tạo file mẫu:", error);
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -67,10 +54,15 @@ export default function ImportRoomModal({ isOpen, onClose, onImport, isImporting
                             </div>
                             <button 
                                 onClick={handleDownloadTemplate}
-                                className="flex items-center gap-1.5 bg-white border border-blue-200 text-blue-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-50 transition-colors"
+                                disabled={isGenerating}
+                                className="flex items-center gap-1.5 bg-white border border-blue-200 text-blue-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-blue-50 transition-colors disabled:opacity-50"
                             >
-                                <Download className="w-3.5 h-3.5" />
-                                Tải về
+                                {isGenerating ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                    <Download className="w-3.5 h-3.5" />
+                                )}
+                                {isGenerating ? 'Đang tạo...' : 'Tải về'}
                             </button>
                         </div>
 

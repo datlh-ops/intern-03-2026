@@ -11,14 +11,12 @@ import RoomPagination from "./components/RoomPagination";
 import ImportResultModal from "./components/ImportResultModal";
 import ImportRoomModal from "./components/ImportRoomModal";
 import DeleteConfirmModal from "../../../components/Common/DeleteConfirmModal";
-import ExportStatusWidget from "../../../components/Common/ExportStatusWidget";
 
 // APIs
 import {
     getAdminRooms,
     deleteRoomApi,
     exportAdminRoomsApi,
-    exportAdminRoomsCloudinaryApi,
     importAdminRoomsApi
 } from "../../../api/room.api";
 
@@ -38,7 +36,6 @@ export default function Rooms() {
     const [districts, setDistricts] = useState([]);
 
     const [isExporting, setIsExporting] = useState(false);
-    const [activeJobId, setActiveJobId] = useState(null);
     const [isOpenImportModal, setIsOpenImportModal] = useState(false);
     const [importResult, setImportResult] = useState({
         isOpen: false,
@@ -151,16 +148,6 @@ export default function Rooms() {
     };
 
 
-    const handleExportCloudinary = async () => {
-        try {
-            const response = await exportAdminRoomsCloudinaryApi(activeFilters);
-            if (response.data.success) {
-                setActiveJobId(response.data.jobId);
-            }
-        } catch (error) {
-            console.error("[CLOUDINARY] Lỗi:", error);
-        }
-    };
 
     const handleImportExcel = async (e) => {
         setIsOpenImportModal(false);
@@ -247,44 +234,83 @@ export default function Rooms() {
                     return;
                 }
 
-                // --- VALIDATE FRONTEND ---
+                // --- VALIDATE FRONTEND TỔNG THỂ ---
                 const validationErrors = [];
+                const seenRoomNumbers = new Set();
+
                 for (const row of rows) {
+                    const rowLabel = row.excelRow;
+                    
+                    // 1. Validate định dạng (Yup)
                     try {
                         await importRowSchema.validate(row, { abortEarly: false });
                     } catch (err) {
                         err.inner.forEach(e => {
-                            validationErrors.push(`Dòng ${row.excelRow}: ${e.message}`);
+                            validationErrors.push(`Dòng ${rowLabel}: ${e.message}`);
                         });
+                    }
+
+                    // 2. Validate trùng lặp trong file
+                    if (row.roomNumber) {
+                        if (seenRoomNumbers.has(row.roomNumber)) {
+                            validationErrors.push(`Dòng ${rowLabel}: Số phòng "${row.roomNumber}" bị trùng lặp trong chính file Excel.`);
+                        }
+                        seenRoomNumbers.add(row.roomNumber);
+                    }
+
+                    // 3. Kiểm tra logic Hợp đồng (Nếu có người thuê)
+                    const hasTenantInfo = !!(row.tenantPhone || row.tenantName);
+                    const hasContractInfo = !!(row.startDate || row.endDate || row.deposit);
+
+                    if (hasTenantInfo || hasContractInfo) {
+                        if (!row.tenantPhone) validationErrors.push(`Dòng ${rowLabel}: Thiếu SĐT người thuê.`);
+                        if (!row.tenantName) validationErrors.push(`Dòng ${rowLabel}: Thiếu Họ tên người thuê.`);
+                        if (!row.startDate) validationErrors.push(`Dòng ${rowLabel}: Thiếu Ngày bắt đầu hợp đồng.`);
+                        if (!row.endDate) validationErrors.push(`Dòng ${rowLabel}: Thiếu Ngày kết thúc hợp đồng.`);
+                        if (!row.status) validationErrors.push(`Dòng ${rowLabel}: Có thông tin thuê nhưng thiếu Trạng thái phòng.`);
+                        else if (row.status !== "Đã thuê") validationErrors.push(`Dòng ${rowLabel}: Có người thuê thì trạng thái phòng phải là "Đã thuê".`);
+                    } else if (row.status === "Đã thuê") {
+                        validationErrors.push(`Dòng ${rowLabel}: Trạng thái phòng là "Đã thuê" nhưng không có thông tin người thuê và hợp đồng.`);
                     }
                 }
 
                 if (validationErrors.length > 0) {
                     setImportResult({
                         isOpen: true,
-                        errors: validationErrors.slice(0, 50), // Hiển thị giới hạn 50 lỗi đầu tiên
+                        errors: validationErrors.slice(0, 100), // Hiển thị tối đa 100 lỗi
                         successMessage: ''
                     });
+                    setIsImporting(false);
+                    e.target.value = "";
                     return;
                 }
                 // -------------------------
 
-                const res = await importAdminRoomsApi(rows);
-                setImportResult({
-                    isOpen: true,
-                    errors: [],
-                    successMessage: res.data.message || "Nhập dữ liệu thành công!"
-                });
-                fetchRooms(page);
+                setIsImporting(true);
+                try {
+                    const res = await importAdminRoomsApi(rows);
+                    setImportResult({
+                        isOpen: true,
+                        errors: [],
+                        successMessage: res.data.message || "Nhập dữ liệu thành công!"
+                    });
+                    fetchRooms(page);
+                } catch (error) {
+                    console.error("Lỗi xử lý gọi API Import:", error);
+                    const errorData = error.response?.data;
+                    setImportResult({
+                        isOpen: true,
+                        errors: errorData?.details || [errorData?.error || errorData?.message || "Lỗi khi xử lý lưu dữ liệu"],
+                        successMessage: ''
+                    });
+                } finally {
+                    setIsImporting(false);
+                    e.target.value = "";
+                }
             } catch (error) {
-                console.error("Lỗi xử lý file Excel:", error);
-                const errorData = error.response?.data;
-                setImportResult({
-                    isOpen: true,
-                    errors: errorData?.details || [errorData?.message || "Lỗi khi xử lý file Excel"],
-                    successMessage: ''
-                });
-            } finally {
+                console.error("Lỗi đọc/phân tích file Excel:", error);
+                toast.error("Đã có lỗi xảy ra khi đọc file!");
+                setIsImporting(false);
                 e.target.value = "";
             }
         };
@@ -313,10 +339,8 @@ export default function Rooms() {
 
                 <RoomHeader
                     handleExport={handleExport}
-                    handleExportCloudinary={handleExportCloudinary}
                     setOpenImportModal={setIsOpenImportModal}
                     isExporting={isExporting}
-                    activeJobId={activeJobId}
                 />
 
                 <RoomFilter
@@ -359,14 +383,6 @@ export default function Rooms() {
                 title="Xác nhận xóa phòng?"
                 message="Hành động này không thể hoàn tác. Dữ liệu phòng sẽ bị xóa vĩnh viễn khỏi hệ thống."
             />
-
-            {activeJobId && (
-                <ExportStatusWidget
-                    jobId={activeJobId}
-                    onClose={() => setActiveJobId(null)}
-                    onFinish={(url) => console.log("Export finished! URL:", url)}
-                />
-            )}
             <ImportResultModal
                 isOpen={importResult.isOpen}
                 onClose={() => setImportResult(prev => ({ ...prev, isOpen: false }))}
