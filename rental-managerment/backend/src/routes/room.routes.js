@@ -5,7 +5,7 @@ const { uploadCloud } = require("../config/cloudinary");
 const { verifyToken, checkRole } = require("../middleware/auth.middleware");
 const validate = require("../middleware/validation.middleware");
 const roomDto = require("../dtos/room.dto");
-const importDto = require("../dtos/import.dto");
+const importDto = require("../dtos/import-room.dto");
 const multer = require("multer");
 const uploadMem = multer({
     storage: multer.memoryStorage(),

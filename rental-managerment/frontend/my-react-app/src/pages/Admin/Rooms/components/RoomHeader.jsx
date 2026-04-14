@@ -1,11 +1,11 @@
 import React from 'react';
 import { FileSpreadsheet, RefreshCcw, Cloud, Upload } from "lucide-react";
 
-export default function RoomHeader({ 
-    handleExport, 
-    handleExportCloudinary, 
+export default function RoomHeader({
+    handleExport,
+    handleExportCloudinary,
     setOpenImportModal,
-    isExporting, 
+    isExporting,
     activeJobId
 }) {
     return (

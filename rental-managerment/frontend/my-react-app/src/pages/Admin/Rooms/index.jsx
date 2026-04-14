@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "react-hot-toast";
-import { importRowSchema } from "../../../schemas/import.schema";
+import { importRowSchema } from "../../../schemas/import-room.schema";
 
 // Components
 import RoomTable from "./components/RoomTable";
@@ -206,11 +206,8 @@ export default function Rooms() {
                 };
 
                 const rows = json.slice(1)
-                    // 1. Găm số dòng gốc vào trước
                     .map((r, i) => ({ raw: r, excelRow: i + 1 }))
-                    // 2. GIỮ NGUYÊN logic lọc dòng trống của bạn
                     .filter(item => item.raw.some(cell => cell !== null && cell !== undefined && cell.toString().trim() !== ""))
-                    // 3. Map sang định dạng gửi đi
                     .map(item => {
                         const r = item.raw;
                         return {

@@ -116,6 +116,9 @@ class RoomExcelService {
   }  /**
    * Tải file Excel mẫu với Dropdown và định dạng chuẩn
    */
+  /**
+   * Tải file Excel mẫu thông minh (Dropdown 3 cấp) và lưu trên Cloudinary
+   */
   async downloadSampleExcel(res) {
     const ExcelJS = require('exceljs');
     const workbook = new ExcelJS.Workbook();
@@ -123,60 +126,108 @@ class RoomExcelService {
 
     const headers = [
       "Họ tên Chủ trọ", "SĐT Chủ trọ", "Email Chủ trọ", "Địa chỉ Chủ trọ",
-      "Số phòng", "Tiêu đề phòng", "Giá thuê (số)", "Diện tích (m2)",
-      "Sức chứa (số)", "Tỉnh/Thành", "Quận/Huyện", "Phường/Xã",
-      "Địa chỉ chi tiết", "Mô tả", "Tiện ích (cách nhau bởi dấu phẩy)",
-      "Nổi bật (Có/Không)", "Trạng thái (Chọn từ danh sách)",
-      "Họ tên người thuê", "SĐT người thuê", "Tiền cọc (số)",
+      "Số phòng", "Tiêu đề phòng", "Giá thuê (VNĐ)", "Diện tích (m2)",
+      "Sức chứa (người)", "Tỉnh/Thành", "Quận/Huyện", "Phường/Xã",
+      "Địa chỉ chi tiết", "Mô tả", "Tiện ích",
+      "Nổi bật", "Trạng thái",
+      "Họ tên người thuê", "SĐT người thuê", "Tiền cọc (VNĐ)",
       "Ngày bắt đầu (dd/mm/yyyy)", "Ngày kết thúc (dd/mm/yyyy)"
     ];
 
     worksheet.addRow(headers);
-
-    // Định dạng Header
     worksheet.getRow(1).font = { bold: true };
-    worksheet.getRow(1).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FFD3D3D3' }
-    };
-    
-    // Tạo Dropdown cho 100 dòng đầu tiên
-    for (let i = 2; i <= 100; i++) {
-        worksheet.getCell(`P${i}`).dataValidation = {
-            type: 'list',
-            allowBlank: true,
-            formulae: ['"Có,Không"'],
-            showErrorMessage: true,
-            errorTitle: 'Lỗi nhập liệu',
-            error: 'Vui lòng chọn giá trị từ danh sách.'
-        };
-        worksheet.getCell(`Q${i}`).dataValidation = {
-            type: 'list',
-            allowBlank: true,
-            formulae: ['"Trống,Đã thuê,Bảo trì,Đã xóa"'],
-            showErrorMessage: true,
-            errorTitle: 'Lỗi nhập liệu',
-            error: 'Vui lòng chọn trạng thái từ danh sách.'
-        };
+    worksheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD3D3D3' } };
+
+    // 1. Fetch dữ liệu địa chính (3 cấp)
+    let locationData = [];
+    try {
+      const resp = await fetch('https://provinces.open-api.vn/api/?depth=3');
+      if (resp.ok) locationData = await resp.json();
+    } catch (err) {
+      console.error("Lỗi fetch địa chính:", err.message);
     }
 
-    // Set độ rộng cột
-    worksheet.columns.forEach(column => {
-        column.width = 25;
-    });
+    const dataSheet = workbook.addWorksheet('_Data', { state: 'hidden' });
+    const sanitize = (name) => {
+      if (!name) return 'UNKNOWN';
+      return 'LOC_' + name.replace(/ /g, '_').replace(/[^\p{L}\p{N}_]/gu, '');
+    };
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=File_Mau_Import_Phong.xlsx');
+    try {
+      // Đổ dữ liệu vào Sheet ẩn và đặt Named Ranges
+      locationData.forEach((p, i) => dataSheet.getCell(i + 1, 1).value = p.name);
+      if (locationData.length > 0) {
+        workbook.definedNames.add(`_Data!$A$1:$A$${locationData.length}`, 'DANH_SACH_TINH');
+      }
 
-    await workbook.xlsx.write(res);
-    res.end();
+      let colIdx = 2;
+      locationData.forEach(p => {
+        const pKey = sanitize(p.name);
+        const districts = p.districts || [];
+        districts.forEach((d, i) => dataSheet.getCell(i + 1, colIdx).value = d.name);
+        if (districts.length > 0) {
+          workbook.definedNames.add(`_Data!$${dataSheet.getColumn(colIdx).letter}$1:$${dataSheet.getColumn(colIdx).letter}$${districts.length}`, pKey);
+          colIdx++;
+          districts.forEach(d => {
+            const dKey = sanitize(d.name);
+            const wards = d.wards || [];
+            wards.forEach((w, i) => dataSheet.getCell(i + 1, colIdx).value = w.name);
+            if (wards.length > 0) {
+              workbook.definedNames.add(`_Data!$${dataSheet.getColumn(colIdx).letter}$1:$${dataSheet.getColumn(colIdx).letter}$${wards.length}`, dKey);
+              colIdx++;
+            }
+          });
+        }
+      });
+
+      // Tình trạng & Nổi bật
+      const fixCol = colIdx;
+      const st = ["Trống", "Đã thuê", "Bảo trì", "Đã xóa"];
+      st.forEach((s, i) => dataSheet.getCell(i + 1, fixCol).value = s);
+      workbook.definedNames.add(`_Data!$${dataSheet.getColumn(fixCol).letter}$1:$${dataSheet.getColumn(fixCol).letter}$4`, 'DANH_SACH_TRANG_THAI');
+      
+      dataSheet.getCell(1, fixCol + 1).value = 'Có';
+      dataSheet.getCell(2, fixCol + 1).value = 'Không';
+      workbook.definedNames.add(`_Data!$${dataSheet.getColumn(fixCol + 1).letter}$1:$${dataSheet.getColumn(fixCol + 1).letter}$2`, 'DANH_SACH_NOI_BAT');
+
+      const indF = (ref) => `=INDIRECT("LOC_" & SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(${ref}," ","_"),"(",""),")",""))`;
+
+      for (let i = 2; i <= 500; i++) {
+        worksheet.getCell(`J${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: ['DANH_SACH_TINH'] };
+        worksheet.getCell(`K${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: [indF(`J${i}`)] };
+        worksheet.getCell(`L${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: [indF(`K${i}`)] };
+        worksheet.getCell(`P${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: ['DANH_SACH_NOI_BAT'] };
+        worksheet.getCell(`Q${i}`).dataValidation = { type: 'list', allowBlank: true, formulae: ['DANH_SACH_TRANG_THAI'] };
+      }
+    } catch (e) { console.error("Excel build error:", e.message); }
+
+    worksheet.columns.forEach(c => c.width = 25);
+
+    // 2. Upload lên Cloudinary
+    try {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const cloudinaryUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { resource_type: "raw", folder: "templates", public_id: "sample_import_room", format: "xlsx", overwrite: true },
+          (err, result) => { if (err) reject(err); else resolve(result.secure_url); }
+        );
+        const { Readable } = require('stream');
+        const readable = new Readable();
+        readable._read = () => {};
+        readable.push(buffer);
+        readable.push(null);
+        readable.pipe(stream);
+      });
+      res.json({ url: cloudinaryUrl });
+    } catch (err) {
+      console.error("Cloudinary failed, fallback to direct download:", err.message);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=File_Mau_Import_Phong.xlsx');
+      await workbook.xlsx.write(res);
+      res.end();
+    }
   }
 
-
-  /**
-   * Xuất danh sách phòng lên Cloudinary (Chạy ngầm)
-   */
   async exportRoomsToCloudinary(jobId, query) {
     const roomRepo = AppDataSource.getRepository("Room");
     const { status, search, city, district } = query;
@@ -406,12 +457,7 @@ class RoomExcelService {
         }
 
         // 3. Xử lý Room
-        // Xác định trạng thái phòng: Ưu tiên theo khách thuê hoặc giá trị status từ Excel
-        const RENTED_KEYWORDS = ['đã thuê', 'rented', '1'];
-        const excelStatus = item.status?.toString().toLowerCase();
-
-        // Mặc định là 0 (AVAILABLE), nếu thuộc nhóm Rented thì set bằng 1 (RENTED)
-        const roomStatus = (tenant || RENTED_KEYWORDS.includes(excelStatus)) ? 1 : 0;
+        const roomStatus = tenant ? 1 : (item.status === 'Đã thuê' ? 1 : 0);
         const room = await queryRunner.manager.save("Room", {
           roomNumber: item.roomNumber,
           title: item.title,
@@ -426,7 +472,7 @@ class RoomExcelService {
           amenities: (typeof item.amenities === 'string' && item.amenities.trim())
             ? item.amenities.split(",").map(s => s.trim())
             : [],
-          isTrending: item.isTrending,
+          isTrending: item.isTrending === 'Có' || item.isTrending === true,
           thumbnail: "https://res.cloudinary.com/ddcxppxll/image/upload/v1712739324/default-room_vjwf1z.jpg",
           master: master,
           status: roomStatus

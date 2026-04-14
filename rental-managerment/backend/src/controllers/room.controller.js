@@ -24,8 +24,6 @@ class RoomController {
     }
   }
 
-
-
   async getAllRooms(req, res) {
     try {
       const result = await roomService.getAllRooms(req.query);

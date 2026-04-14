@@ -10,13 +10,23 @@ export default function ImportRoomModal({ isOpen, onClose, onImport, isImporting
     const handleDownloadTemplate = async () => {
         try {
             const response = await downloadTemplateApi();
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            
+            // Nếu trả về URL từ Cloudinary
+            if (response.data?.url) {
+                window.open(response.data.url, '_blank');
+                return;
+            }
+
+            // Phương án dự phòng (Fallback) nếu trả về file nhị phân trực tiếp
+            const blob = response.data instanceof Blob ? response.data : new Blob([response.data]);
+            const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
             link.setAttribute('download', 'Mau_Import_Phong.xlsx');
             document.body.appendChild(link);
             link.click();
             link.remove();
+            window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Lỗi tải file mẫu:", error);
         }

@@ -12,7 +12,6 @@ export const importRowSchema = yup.object({
     masterPhone: yup.string().required("SĐT chủ trọ là bắt buộc").matches(phoneRegExp, "SĐT không đúng định dạng VN"),
     masterEmail: yup.string().required("Email chủ trọ là bắt buộc").matches(emailRegExp, "Email không hợp lệ").trim(),
     masterAddress: yup.string().nullable().trim(),
-
     roomNumber: yup.string().required("Số phòng là bắt buộc").trim(),
     title: yup.string().required("Tiêu đề phòng là bắt buộc").trim(),
     price: yup.number().typeError("Giá phòng phải là số").required("Giá phòng là bắt buộc").positive("Giá phải dương").max(15000000, "Giá phòng không được quá 15 triệu"),
@@ -26,7 +25,6 @@ export const importRowSchema = yup.object({
     amenities: yup.string().nullable().trim(),
     status: yup.string().nullable().default("Trống"),
     isTrending: yup.boolean().default(false),
-
     tenantName: yup.string().nullable().trim(),
     tenantPhone: yup.string().nullable().matches(phoneRegExp, "SĐT người thuê không hợp lệ"),
     deposit: yup.number().typeError("Tiền cọc phải là số").nullable().default(0),
