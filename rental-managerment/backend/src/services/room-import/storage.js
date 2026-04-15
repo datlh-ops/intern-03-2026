@@ -26,15 +26,19 @@ class RoomImportStorage {
             email: item.masterEmail,
             address: item.masterAddress
           });
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash("123456", salt);
-          await queryRunner.manager.save("Account", {
-            username: item.masterPhone,
-            password: hashedPassword,
-            role: "master",
-            masterId: master.id,
-            status: "active"
-          });
+          // Kiểm tra Account đã tồn tại chưa trước khi tạo mới
+          const existingMasterAccount = await queryRunner.manager.findOne("Account", { where: { username: item.masterPhone } });
+          if (!existingMasterAccount) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash("123456", salt);
+            await queryRunner.manager.save("Account", {
+              username: item.masterPhone,
+              password: hashedPassword,
+              role: "master",
+              masterId: master.id,
+              status: "active"
+            });
+          }
           masterCache.set(item.masterPhone, master);
         }
 
@@ -51,15 +55,19 @@ class RoomImportStorage {
               phone: item.tenantPhone,
               email: item.tenantEmail || null
             });
-            const salt = await bcrypt.genSalt(10);
-            const hashedUserPassword = await bcrypt.hash("123456", salt);
-            await queryRunner.manager.save("Account", {
-              username: item.tenantPhone,
-              password: hashedUserPassword,
-              role: "user",
-              userId: tenant.id,
-              status: "active"
-            });
+            // Kiểm tra Account đã tồn tại chưa trước khi tạo mới
+            const existingUserAccount = await queryRunner.manager.findOne("Account", { where: { username: item.tenantPhone } });
+            if (!existingUserAccount) {
+              const salt = await bcrypt.genSalt(10);
+              const hashedUserPassword = await bcrypt.hash("123456", salt);
+              await queryRunner.manager.save("Account", {
+                username: item.tenantPhone,
+                password: hashedUserPassword,
+                role: "user",
+                userId: tenant.id,
+                status: "active"
+              });
+            }
             userCache.set(item.tenantPhone, tenant);
           }
         }

@@ -63,7 +63,6 @@ export default function Rooms() {
         fetchRooms(page);
     }, [page, activeFilters]);
 
-
     // Fetch tỉnh thành
     useEffect(() => {
         const fetchProvinces = async () => {
@@ -147,9 +146,8 @@ export default function Rooms() {
         }
     };
 
-
-
     const handleImportExcel = async (e) => {
+
         setIsOpenImportModal(false);
         const file = e.target.files[0];
         if (!file) return;
@@ -168,33 +166,52 @@ export default function Rooms() {
                 const workbook = XLSX.read(data, { type: 'array', cellDates: true });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
+                const expectedColumnNumber = 22;
 
                 const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
+                const Headers = json[0].filter(cell => cell !== null && cell !== undefined && cell.toString().trim() !== "")
+                const actualHeaders = Headers.length;
                 // Hàm xử lý ngày tháng từ Excel
-                const formatExcelDate = (val) => {
-                    if (!val) return null;
-
-                    let date;
-                    if (val instanceof Date) {
-                        date = val;
-                    } else if (typeof val === 'number') {
-                        date = new Date(Math.round((val - 25569) * 86400 * 1000));
-                    } else if (typeof val === 'string' && val.includes('/')) {
-                        const [d, m, y] = val.split('/');
-                        return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
-                    } else {
-                        return val;
+                const formatExcelDate = (value) => {
+                    if (!value) return null;
+                    let parsedDate;
+                    switch (typeof value) {
+                        case 'number':
+                            parsedDate = new Date(Math.round((value - 25569) * 86400 * 1000));
+                            break;
+                        case 'string':
+                            if (value.includes('/')) {
+                                const [date, month, year] = value.split('/');
+                                return `${date.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+                            }
+                            return value;
+                        case 'object':
+                            if (value instanceof Date) {
+                                parsedDate = value;
+                                break;
+                            }
+                            return value;
+                        default:
+                            return value;
                     }
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const year = date.getFullYear();
+                    const day = String(parsedDate.getDate()).padStart(2, '0');
+                    const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                    const year = parsedDate.getFullYear();
+
                     return `${day}/${month}/${year}`;
                 };
 
                 const rows = json.slice(1)
                     .map((r, i) => ({ raw: r, excelRow: i + 1 }))
-                    .filter(item => item.raw.some(cell => cell !== null && cell !== undefined && cell.toString().trim() !== ""))
+                    .filter(item => {
+                        const r = item.raw;
+                        // Kiểm tra xem ít nhất một trong các cột quan trọng có dữ liệu không
+                        const hasCoreData = [0, 1, 2, 4, 5, 6].some(index => {
+                            const val = r[index];
+                            return val !== null && val !== undefined && val.toString().trim() !== "";
+                        });
+                        return hasCoreData;
+                    })
                     .map(item => {
                         const r = item.raw;
                         return {
@@ -237,40 +254,32 @@ export default function Rooms() {
                 // --- VALIDATE FRONTEND TỔNG THỂ ---
                 const validationErrors = [];
                 const seenRoomNumbers = new Set();
+                console.log("so dong cua file : " + actualHeaders)
+                console.log("file format : " + expectedColumnNumber)
+                if (actualHeaders < expectedColumnNumber) {
+                    validationErrors.push("File không đúng format! Hãy tải file mẫu có sẵn");
 
-                for (const row of rows) {
-                    const rowLabel = row.excelRow;
-                    
-                    // 1. Validate định dạng (Yup)
-                    try {
-                        await importRowSchema.validate(row, { abortEarly: false });
-                    } catch (err) {
-                        err.inner.forEach(e => {
-                            validationErrors.push(`Dòng ${rowLabel}: ${e.message}`);
-                        });
-                    }
+                }
+                else {
+                    for (const row of rows) {
+                        const rowLabel = row.excelRow;
 
-                    // 2. Validate trùng lặp trong file
-                    if (row.roomNumber) {
-                        if (seenRoomNumbers.has(row.roomNumber)) {
-                            validationErrors.push(`Dòng ${rowLabel}: Số phòng "${row.roomNumber}" bị trùng lặp trong chính file Excel.`);
+                        // 1. Validate định dạng (Yup)
+                        try {
+                            await importRowSchema.validate(row, { abortEarly: false });
+                        } catch (err) {
+                            err.inner.forEach(e => {
+                                validationErrors.push(`Dòng ${rowLabel}: ${e.message}`);
+                            });
                         }
-                        seenRoomNumbers.add(row.roomNumber);
-                    }
+                        // 2. Validate trùng lặp trong file
+                        if (row.roomNumber) {
+                            if (seenRoomNumbers.has(row.roomNumber)) {
+                                validationErrors.push(`Dòng ${rowLabel}: Số phòng "${row.roomNumber}" bị trùng lặp trong chính file Excel.`);
+                            }
+                            seenRoomNumbers.add(row.roomNumber);
+                        }
 
-                    // 3. Kiểm tra logic Hợp đồng (Nếu có người thuê)
-                    const hasTenantInfo = !!(row.tenantPhone || row.tenantName);
-                    const hasContractInfo = !!(row.startDate || row.endDate || row.deposit);
-
-                    if (hasTenantInfo || hasContractInfo) {
-                        if (!row.tenantPhone) validationErrors.push(`Dòng ${rowLabel}: Thiếu SĐT người thuê.`);
-                        if (!row.tenantName) validationErrors.push(`Dòng ${rowLabel}: Thiếu Họ tên người thuê.`);
-                        if (!row.startDate) validationErrors.push(`Dòng ${rowLabel}: Thiếu Ngày bắt đầu hợp đồng.`);
-                        if (!row.endDate) validationErrors.push(`Dòng ${rowLabel}: Thiếu Ngày kết thúc hợp đồng.`);
-                        if (!row.status) validationErrors.push(`Dòng ${rowLabel}: Có thông tin thuê nhưng thiếu Trạng thái phòng.`);
-                        else if (row.status !== "Đã thuê") validationErrors.push(`Dòng ${rowLabel}: Có người thuê thì trạng thái phòng phải là "Đã thuê".`);
-                    } else if (row.status === "Đã thuê") {
-                        validationErrors.push(`Dòng ${rowLabel}: Trạng thái phòng là "Đã thuê" nhưng không có thông tin người thuê và hợp đồng.`);
                     }
                 }
 

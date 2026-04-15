@@ -54,15 +54,16 @@ class RoomImportValidator {
         if (!item.endDate) validationErrors.push(`Dòng ${rowLabel}: Thiếu Ngày kết thúc hợp đồng.`);
 
         // Trạng thái phòng cũng không được để trống và phải là Đã thuê
+        console.log(`trang thai phong la ${item.status}`)
         if (!item.status) {
           validationErrors.push(`Dòng ${rowLabel}: Có thông tin thuê nhưng thiếu Trạng thái phòng.`);
-        } else if (item.status !== "Đã thuê") {
-          validationErrors.push(`Dòng ${rowLabel}: Có người thuê thì Trạng thái phòng phải là "Đã thuê".`);
+        } else if (item.status !== "Đã Thuê") {
+          validationErrors.push(`Dòng ${rowLabel}: Có người thuê thì Trạng thái phòng phải là "Đã Thuê".`);
         }
       }
       // Quy tắc B: Nếu KHÔNG có người thuê thì KHÔNG ĐƯỢC có nội dung thuê phòng/hợp đồng
       else {
-        if (item.status === "Đã thuê") {
+        if (item.status === "Đã Thuê") {
           validationErrors.push(`Dòng ${rowLabel}: Trạng thái phòng là "Đã thuê" nhưng không có thông tin người thuê và hợp đồng.`);
         }
       }
