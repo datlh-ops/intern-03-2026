@@ -9,19 +9,20 @@ import { loginSchema as schema } from '../../schemas/auth.schema';
 
 export default function Login() {
   const [generalError, setGeneralError] = useState("");
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: yupResolver(schema),
     mode: 'all',
     reValidateMode: 'onBlur',
-    defaultValues: { username: "", password: "" },
+    defaultValues: { username: "", password: "", role: "master" },
   });
+  const selectedRole = watch("role");
   const navigate = useNavigate();
   const { loginContext } = useAuth();
 
   const onSubmit = async (data) => {
     try {
       setGeneralError("");
-      const resp = await loginUser(data.username, data.password);
+      const resp = await loginUser(data.username, data.password, data.role);
       await loginContext(resp);
       navigate("/");
     } catch (error) {
@@ -75,11 +76,24 @@ export default function Login() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Vai trò đăng nhập</label>
+              <select
+                {...register("role")}
+                className={`w-full bg-slate-900 border ${errors.role ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all appearance-none cursor-pointer`}
+              >
+                <option value="user" className="bg-slate-950">Người Thuê Phòng</option>
+                <option value="master" className="bg-slate-950">Chủ Nhà (Master)</option>
+                <option value="admin" className="bg-slate-950">Quản Trị Viên (Admin)</option>
+              </select>
+              {errors.role && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.role.message}</p>}
+            </div>
+
+            <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Tên đăng nhập</label>
               <input
                 {...register("username")}
                 className={`w-full bg-slate-900 border ${errors.username ? 'border-rose-500' : 'border-slate-800 focus:border-emerald-500'} rounded-2xl py-4 px-6 text-white text-sm font-bold outline-none transition-all placeholder:text-slate-600`}
-                placeholder="name@company.com"
+                placeholder="Số điện thoại hoặc Username"
               />
               {errors.username && <p className="text-rose-500 text-[9px] font-black uppercase tracking-widest ml-1 mt-1">{errors.username.message}</p>}
             </div>
