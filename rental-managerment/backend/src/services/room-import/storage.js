@@ -2,9 +2,6 @@ const { AppDataSource } = require("../../config/db");
 const bcrypt = require("bcryptjs");
 
 class RoomImportStorage {
-  /**
-   * Lưu dữ liệu đã validate vào DB (dùng Transaction)
-   */
   async saveRows(rows) {
     const queryRunner = AppDataSource.createQueryRunner();
     await queryRunner.connect();
