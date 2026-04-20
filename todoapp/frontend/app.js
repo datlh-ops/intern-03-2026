@@ -34,7 +34,7 @@ const changeStatus =(index) =>{
     renderTask();
 }
 
-window.deleteTask =(index)=>{
+const deleteTask =(index)=>{
     if(confirm("ban co chac chan muon xoa hay khong ?")){
         tasks.splice(index,1); // xoá từ phần tử thứ index và xoá 1 phần tử ở đó 
         addTask();
@@ -42,7 +42,7 @@ window.deleteTask =(index)=>{
     }
 }
 
-window.editTask =(index) =>{
+const editTask =(index) =>{
     const newTiltle = prompt("nhap tieu de moi :", tasks[index].title);
     const newDetail = prompt("nhap thong tin moi : ", tasks[index].detail)
 

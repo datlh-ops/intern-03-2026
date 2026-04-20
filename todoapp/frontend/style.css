@@ -112,6 +112,6 @@ button:hover {
     color :black;
 }
 
-.task-card:hover{
+.task-card:hover{ /*id selector*/
     background-color: aquamarine;
 }
