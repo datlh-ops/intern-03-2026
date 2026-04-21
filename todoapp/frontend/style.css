@@ -1,7 +1,7 @@
 * {
   margin : 0;
   padding :0;
-  box-sizing : border-box; /* chuan theo box*/
+  box-sizing : border-box; /* chuan theo box,voi content box la default*/
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;  
 }
 
@@ -99,6 +99,7 @@ button:hover {
     border-radius : 12px ;
     border : 1px solid #333;
     min-height: 120px;
+    margin : auto; /* căn ra giữa */
 }
 
 .task-card h3{
@@ -115,3 +116,43 @@ button:hover {
 .task-card:hover{ /*id selector*/
     background-color: aquamarine;
 }
+
+#modal-hidden {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    background-color: white;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 12px;
+    padding: 20px; /* Thêm padding cho các chữ không bị dính sát lề */
+    z-index: 100;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.update-title label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.update-title input[type="text"], 
+.update-title textarea {
+    width: 100%; 
+    box-sizing: border-box; 
+    border: solid 1px #ccc;
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 15px; 
+}
+
+.title-change {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+

@@ -2,8 +2,18 @@ const titleInput = document.getElementById("input-name");
 const detailInput = document.getElementById('task-detail')
 const button = document.getElementById("submit-task")
 const notesGrid = document.querySelector(".notes-grid")
+const taskCard = document.querySelector(".task-card");
+
+const titleUpdate = document.getElementById("update-title-input");
+const detailUpdate = document.getElementById("task-detail-update");
+const modalfield = document.getElementById("modal-hidden")
+const overlay = document.getElementById("modal-overlay")
+const indexEdit = document.getElementById("update-index")
+
 
 let tasks = JSON.parse(localStorage.getItem("myTasks")) || []
+
+
 
 const renderTask =() =>{
     notesGrid.innerHTML=""; // xoa noi dung cu de ve lai
@@ -14,9 +24,10 @@ const renderTask =() =>{
                 <h3>${task.title}</h3>
                 <p>${task.detail}</p>
                 <p>(${task.status})</p>
+
                 <button onclick =changeStatus(${index})>tich</button>
-                <button onclick="editTask(${index})">Sửa</button>
-                <button onclick="deleteTask(${index})" style ="background: #ff4d4d">Xoá</button>
+                <button id = "open-modal" onclick="openModal(${index})">Sửa</button>
+                <button id = "delete-task" onclick="deleteTask(${index})" style ="background: #ff4d4d">Xoá</button>
             </div>
         `;
         notesGrid.insertAdjacentHTML("beforeend",taskHTML);
@@ -37,17 +48,6 @@ const changeStatus =(index) =>{
 const deleteTask =(index)=>{
     if(confirm("ban co chac chan muon xoa hay khong ?")){
         tasks.splice(index,1); // xoá từ phần tử thứ index và xoá 1 phần tử ở đó 
-        addTask();
-        renderTask();
-    }
-}
-
-const editTask =(index) =>{
-    const newTiltle = prompt("nhap tieu de moi :", tasks[index].title);
-    const newDetail = prompt("nhap thong tin moi : ", tasks[index].detail)
-
-    if(newTiltle && newDetail){
-        tasks[index] = {title: newTiltle, detail :newDetail};
         addTask();
         renderTask();
     }
@@ -94,5 +94,38 @@ detailInput.addEventListener('keydown',(e)=>{
         titleInput.focus();
     }
 })
+const openModal =(index)=>{
+    const task = tasks[index];
+    titleUpdate.value = task.title;
+    detailUpdate.value = task.detail;
+    indexEdit.value = index;
+
+    document.title = `edit ${task.title}`;
+
+    modalfield.classList.remove('hidden')
+    overlay.classList.remove('hidden')
+}
+
+const closeModal =() =>{
+    document.title = `Todolist app`
+    overlay.classList.add('hidden')
+    modalfield.classList.add('hidden')
+    
+}
+
+document.getElementById("close-edit").onclick = closeModal;
+overlay.onclick = closeModal;
+
+document.getElementById("confirm-update").onclick=()=>{
+    const idx = indexEdit.value;
+    console.log(`task dang sưa la ${idx}`)
+    tasks[idx]= {
+        ...tasks[idx], title: titleUpdate.value.trim(), detail : detailUpdate.value.trim()
+    }
+    console.log(tasks[idx])
+    addTask();
+    renderTask();
+    closeModal();
+}
 
 renderTask();
