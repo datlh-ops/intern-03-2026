@@ -110,7 +110,6 @@ const closeModal =() =>{
     document.title = `Todolist app`
     overlay.classList.add('hidden')
     modalfield.classList.add('hidden')
-    
 }
 
 document.getElementById("close-edit").onclick = closeModal;
